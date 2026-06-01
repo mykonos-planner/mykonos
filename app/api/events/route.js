@@ -1,8 +1,9 @@
 import { Redis } from '@upstash/redis';
 
+// Usa la variabile corretta per l'URL REST (https)
 const redis = new Redis({
-  url: process.env.KV_URL,
-  token: process.env.KV_REST_API_TOKEN,
+  url: process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN,
 });
 
 export async function GET() {
@@ -12,7 +13,7 @@ export async function GET() {
     events = events.map(e => typeof e === 'string' ? JSON.parse(e) : e);
     return Response.json({ events });
   } catch (error) {
-    console.error('Redis error:', error);
+    console.error('Redis GET error:', error);
     return Response.json({ events: [] });
   }
 }
@@ -45,7 +46,6 @@ export async function POST(request) {
         category: event.category || 'Night Club',
         budget: event.budget || 'mid'
       };
-      // Prova a scrivere su Redis
       await redis.rpush('events', JSON.stringify(newEvent));
       return Response.json({ success: true, event: newEvent });
     }
