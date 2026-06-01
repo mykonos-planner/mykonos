@@ -10,7 +10,8 @@ export default function RootLayout({ children }) {
         margin: 0,
         backgroundColor: '#e6f0f5',
         fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
-        color: '#1e2a3e'
+        color: '#1e2a3e',
+        transition: 'background-color 0.3s, color 0.3s'
       }}>
         {children}
       </body>
