@@ -1,0 +1,15 @@
+ciao, sono un promoter a mykonos ed essenzialmente organizzo i viaggi dei miei clienti che mi scrivono su whatsapp.
+Gestisco beach clubs, ristoranti & dinner show, night clubs, e altre cose come jetski, boat rental, yacht rental, boat party, car rental, scooter rental e atv rental.
+Essenzialmente di solito i clienti mi scrivono per organizzare, da quando arrivono, quanto ci stanno e io organizzo tutto in base agli eventi che sono disponibili in quella finestra.
+Voglio creare un sito (sia desktop che mobile friendly) che aiuti i clienti ad organizzare il viaggio e mandarmi un bel messaggio whatsapp formattato che mi aiuta ad organizzare tutto e non perdere tempo a sentire cosa vogliono.
+Per fare questo sito ti allego i file di tutti gli eventi e le altre cose con prezzi e tutto e ora ti spiego come deve essere fatto il sito e come deve funzionare
+Allora, il sito pensavo di hostarlo in un raspberry pi 3 e comprare il dominio su cloudflare per poterlo far vedere a tutti, quindi prima di tutto spiegami anche come fare in modo che questa cosa funzioni
+Il sito funziona così:
+c'è una schermata iniziale (con scelta di cambiare lingua tra italiano, inglese, francese e spagnolo) che riassume cosa offre questo planning (beach clubs, ristoranti & dinner show, night clubs, e altre cose come jetski, boat rental, yacht rental, boat party, car rental, scooter rental e atv rental.)
+è possibile da questa schermata scegliere due cose: 
+una schermata "esplora" che visualizzare il calendario degli eventi (con giorno, nome evento, nome del posto, e un tag che fa capire a quale categoria di evento appartiene)
+una schermata "planning" che mi permette di generare il messaggio che deve mandare il cliente a me: deve poter mettere il nome del cliente, quanti sono nel gruppo del viaggio, la data di arrivo, i giorni di soggiorno (metti 3gg, 5gg, 7gg, 10gg, 14gg e "personalizza"), deve poter scegliere il budget (tra luxury, mid range e budget). Fatto ciò ci deve essere un pulsante che permette di creare il programma (nella lingua scelta inizialmente dal cliente) e deve poter copiare il messaggio per poterlo poi mandare a me (il messaggio deve contenere tutte le informazioni soprastanti)
+Detto ciò, le informazioni riguardo eventi e prezzi sono tutte dentro alla cartella che ti sto per inviare, da cui devi prima organizzare bene i dettagli e mandameli cosi che io possa controllarli
+Visto che devono ancora uscire altri eventi, crea un modo nascosto con nome e password criptati a tua scelta che mi permettono di accedere ad un'altra schermata che mi permette di aggiungere o togliere eventi o altro
+Detto ciò, il sito deve essere semplice, veloce ma elegante
+Visto che c'è il limite di 20 allegati
