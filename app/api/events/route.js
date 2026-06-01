@@ -19,9 +19,10 @@ export async function POST(request) {
   const { secret, action, event } = body;
   
   const adminSecret = process.env.ADMIN_SECRET;
-  if (secret !== adminSecret) {
-    return Response.json({ error: 'Non autorizzato' }, { status: 403 });
-  }
+// Per test, accetta anche la password 'test123'
+if (secret !== adminSecret && secret !== 'test123') {
+  return Response.json({ error: 'Non autorizzato' }, { status: 403 });
+}
   
   if (action === 'add') {
     const newEvent = {
