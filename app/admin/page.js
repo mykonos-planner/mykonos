@@ -28,18 +28,25 @@ export default function AdminPage() {
     setEvents(data.events || []);
   };
 
-  const addEvent = async () => {
-    if (!newEvent.date || !newEvent.name) return alert('Compila data e nome');
+ const addEvent = async () => {
+  if (!newEvent.date || !newEvent.name) return alert('Compila data e nome');
+  try {
     const res = await fetch('/api/events', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ secret: password, action: 'add', event: newEvent })
     });
+    const data = await res.json();
     if (res.ok) {
       fetchEvents();
       setNewEvent({ date: '', name: '', venue: '', category: '', budget: 'mid' });
-    } else alert('Errore durante l\'aggiunta');
-  };
+    } else {
+      alert('Errore: ' + (data.error || 'risposta sconosciuta'));
+    }
+  } catch (err) {
+    alert('Errore di connessione: ' + err.message);
+  }
+};
 
   const deleteEvent = async (id) => {
     if (!confirm('Eliminare?')) return;
