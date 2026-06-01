@@ -1,26 +1,9 @@
 'use client';
-export const dynamic = 'force-dynamic';
 import { useState, useEffect } from 'react';
 
 export default function AdminPage() {
-  const [password, setPassword] = useState('');
-  const [loggedIn, setLoggedIn] = useState(false);
   const [events, setEvents] = useState([]);
   const [newEvent, setNewEvent] = useState({ date: '', name: '', venue: '', category: '', budget: 'mid' });
-
-  const login = async () => {
-    const res = await fetch('/api/events', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ secret: password, action: 'list' })
-    });
-    if (res.ok) {
-      setLoggedIn(true);
-      fetchEvents();
-    } else {
-      alert('Password errata');
-    }
-  };
 
   const fetchEvents = async () => {
     const res = await fetch('/api/events');
@@ -33,7 +16,7 @@ export default function AdminPage() {
     const res = await fetch('/api/events', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ secret: password, action: 'add', event: newEvent })
+      body: JSON.stringify({ action: 'add', event: newEvent })
     });
     if (res.ok) {
       fetchEvents();
@@ -46,20 +29,14 @@ export default function AdminPage() {
     await fetch('/api/events', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ secret: password, action: 'delete', event: { id } })
+      body: JSON.stringify({ action: 'delete', event: { id } })
     });
     fetchEvents();
   };
 
-  if (!loggedIn) {
-    return (
-      <div style={{ maxWidth: 400, margin: '100px auto', background: 'white', padding: 30, borderRadius: 20 }}>
-        <h2>🔐 Accesso admin</h2>
-        <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Password" style={{ width: '100%', padding: 10, marginBottom: 10, borderRadius: 16, border: '1px solid #ccc' }} />
-        <button onClick={login} style={{ background: '#1e2a3e', color: 'white', padding: '10px 20px', border: 'none', borderRadius: 40 }}>Entra</button>
-      </div>
-    );
-  }
+  useEffect(() => {
+    fetchEvents();
+  }, []);
 
   return (
     <div style={{ maxWidth: 1000, margin: '40px auto', padding: 20 }}>
