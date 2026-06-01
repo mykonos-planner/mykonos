@@ -16,9 +16,18 @@ export async function GET() {
 
 export async function POST(request) {
   const body = await request.json();
-  const { action, event } = body;
+  const { secret, action, event } = body;
   
-  // NESSUN CONTROLLO PASSWORD - TUTTI POSSONO SCRIVERE (SOLO PER TEST)
+  const adminSecret = process.env.ADMIN_SECRET;
+  const isAuthorized = adminSecret && secret === adminSecret;
+  
+  if (action === 'auth') {
+    return Response.json({ success: isAuthorized });
+  }
+  
+  if (!isAuthorized) {
+    return Response.json({ error: 'Non autorizzato' }, { status: 403 });
+  }
   
   if (action === 'add') {
     const newEvent = {
