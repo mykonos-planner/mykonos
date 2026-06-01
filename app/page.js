@@ -15,7 +15,6 @@ export default function HomePage() {
   const [filterCategory, setFilterCategory] = useState('all');
   const [filterVenue, setFilterVenue] = useState('all');
 
-  // Tema e data
   useEffect(() => {
     fetch('/api/events')
       .then(res => res.json())
@@ -37,13 +36,8 @@ export default function HomePage() {
     updateBodyTheme(newDark);
   };
 
-  // Traduzioni complete (incluso sottotitolo)
   const translations = {
     it: {
-      morningLabel: 'Mattina/Pomeriggio',
-      mealLabel: 'Pranzo/Cena',
-      eveningLabel: 'Serata',
-      extraLabel: 'Extra',
       explore: '📅 Eventi',
       planning: '✍️ Planning',
       services: '🏖️ Locali & Servizi',
@@ -68,13 +62,13 @@ export default function HomePage() {
       filterCat: 'Filtra per categoria',
       filterVenue: 'Filtra per locale',
       all: 'Tutti',
-      dayNames: ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato']
+      dayNames: ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato'],
+      morningLabel: 'Mattina/Pomeriggio',
+      mealLabel: 'Pranzo/Cena',
+      eveningLabel: 'Serata',
+      extraLabel: 'Extra'
     },
     en: {
-      morningLabel: 'Morning/Afternoon', 
-      mealLabel: 'Lunch/Dinner', 
-      eveningLabel: 'Evening', 
-      extraLabel: 'Extra',
       explore: '📅 Events',
       planning: '✍️ Planning',
       services: '🏖️ Venues & Services',
@@ -99,13 +93,13 @@ export default function HomePage() {
       filterCat: 'Filter by category',
       filterVenue: 'Filter by venue',
       all: 'All',
-      dayNames: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+      dayNames: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+      morningLabel: 'Morning/Afternoon',
+      mealLabel: 'Lunch/Dinner',
+      eveningLabel: 'Evening',
+      extraLabel: 'Extra'
     },
     fr: {
-      morningLabel: 'Matin/Après-midi', 
-      mealLabel: 'Déjeuner/Dîner', 
-      eveningLabel: 'Soirée', 
-      extraLabel: 'Extra',
       explore: '📅 Événements',
       planning: '✍️ Planification',
       services: '🏖️ Lieux & Services',
@@ -130,13 +124,13 @@ export default function HomePage() {
       filterCat: 'Filtrer par catégorie',
       filterVenue: 'Filtrer par lieu',
       all: 'Tous',
-      dayNames: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi']
+      dayNames: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],
+      morningLabel: 'Matin/Après-midi',
+      mealLabel: 'Déjeuner/Dîner',
+      eveningLabel: 'Soirée',
+      extraLabel: 'Extra'
     },
     es: {
-      morningLabel: 'Mañana/Tarde', 
-      mealLabel: 'Comida/Cena', 
-      eveningLabel: 'Noche', 
-      extraLabel: 'Extra',
       explore: '📅 Eventos',
       planning: '✍️ Planificación',
       services: '🏖️ Lugares & Servicios',
@@ -161,15 +155,16 @@ export default function HomePage() {
       filterCat: 'Filtrar por categoría',
       filterVenue: 'Filtrar por lugar',
       all: 'Todos',
-      dayNames: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
+      dayNames: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+      morningLabel: 'Mañana/Tarde',
+      mealLabel: 'Comida/Cena',
+      eveningLabel: 'Noche',
+      extraLabel: 'Extra'
     }
   };
   const t = translations[lang] || translations.it;
 
-  // Funzione per capitalizzare i mesi in tutte le lingue
-  const capitalizeMonth = (monthStr) => {
-    return monthStr.charAt(0).toUpperCase() + monthStr.slice(1);
-  };
+  const capitalizeMonth = (monthStr) => monthStr.charAt(0).toUpperCase() + monthStr.slice(1);
 
   const groupEventsByMonth = (eventsList) => {
     const groups = {};
@@ -184,7 +179,6 @@ export default function HomePage() {
     return groups;
   };
 
-  // Validazione
   const validateForm = () => {
     let err = {};
     if (!formData.name.trim()) err.name = true;
@@ -196,15 +190,13 @@ export default function HomePage() {
     return Object.keys(err).length === 0;
   };
 
-  // Genera itinerario giorno per giorno
   const generateItinerary = () => {
     if (!validateForm()) return;
     let days = parseInt(formData.stayDays === 'custom' ? formData.customDays : formData.stayDays);
     if (isNaN(days)) days = 7;
     const startDate = new Date(formData.arrivalDate);
-    const budgetLevel = formData.budget; // 'budget', 'mid', 'luxury'
+    const budgetLevel = formData.budget;
 
-    // Filtra eventi nel periodo
     const endDate = new Date(startDate);
     endDate.setDate(startDate.getDate() + days - 1);
     const eventsInRange = events.filter(ev => {
@@ -213,21 +205,18 @@ export default function HomePage() {
       return evDate >= startDate && evDate <= endDate;
     });
 
-    // Separa per categoria (usa 'category' o 'type')
     const musicEvents = eventsInRange.filter(ev => ev.category === 'Night Club' || ev.type === 'event');
     const restaurantsList = events.filter(ev => ev.category === 'Restaurant' || ev.type === 'restaurant');
     const beachesList = events.filter(ev => ev.category === 'Beach' || ev.type === 'beach');
     const extrasList = events.filter(ev => ev.type === 'extra');
 
-    // Helper per filtrare per budget (confronta con il campo budget dell'evento)
     const filterByBudget = (item) => {
-      if (!item.budget) return true; // se non specificato, va bene per tutti
+      if (!item.budget) return true;
       if (budgetLevel === 'luxury') return item.budget === 'luxury' || item.budget === 'mid';
-      if (budgetLevel === 'mid') return item.budget !== 'luxury'; // mid e budget
+      if (budgetLevel === 'mid') return item.budget !== 'luxury';
       return item.budget === 'budget' || !item.budget;
     };
 
-    // Costruisci itinerario
     let itinerary = '';
     for (let i = 0; i < days; i++) {
       const currentDate = new Date(startDate);
@@ -237,7 +226,6 @@ export default function HomePage() {
       const dayEvents = musicEvents.filter(ev => ev.date === formattedDate);
       const musicSuggestion = dayEvents.length > 0 ? dayEvents[0].name : (musicEvents.length > 0 ? musicEvents[i % musicEvents.length].name : 'Serata libera');
       
-      // Suggerimenti ristorante e spiaggia/extra (prendi casuale ma coerente con budget)
       const availableRestaurants = restaurantsList.filter(filterByBudget);
       const restaurantSuggestion = availableRestaurants.length > 0 ? availableRestaurants[i % availableRestaurants.length].name : 'Taverna locale';
       
@@ -254,17 +242,10 @@ export default function HomePage() {
       itinerary += `   ⚡ ${t.extraLabel}: ${extraSuggestion}\n`;
     }
     
-       const msg = `🏝️ MYKONOS PLANNING 🏝️
-━━━━━━━━━━━━━━━━━━
-👤 ${t.name}: ${formData.name}
-👥 ${t.group}: ${formData.groupSize}
-📅 ${t.arrival}: ${formData.arrivalDate}
-⏱️ ${t.days}: ${days}
-💰 ${t.budgetLabel}: ${formData.budget === 'luxury' ? 'Luxury' : formData.budget === 'mid' ? 'Mid Range' : 'Budget'}
+    const msg = `🏝️ MYKONOS PLANNING 🏝️\n━━━━━━━━━━━━━━━━━━\n👤 ${t.name}: ${formData.name}\n👥 ${t.group}: ${formData.groupSize}\n📅 ${t.arrival}: ${formData.arrivalDate}\n⏱️ ${t.days}: ${days}\n💰 ${t.budgetLabel}: ${formData.budget === 'luxury' ? 'Luxury' : formData.budget === 'mid' ? 'Mid Range' : 'Budget'}\n${itinerary}`;
+    setGeneratedMsg(msg);
+  };
 
-${itinerary}`;
-    
-  // Filtri per la visualizzazione eventi
   const uniqueVenues = [...new Set(events.map(ev => ev.venue).filter(Boolean))];
   const filteredEvents = events.filter(ev => {
     if (filterCategory !== 'all' && ev.category !== filterCategory) return false;
@@ -272,7 +253,6 @@ ${itinerary}`;
     return true;
   });
 
-  // Dati statici per la sezione servizi
   const servicesData = {
     beachClubs: ['Scorpios', 'Nammos', 'Principote', 'SantAnna', 'Kalua', 'Anios', 'Super Paradise', 'Tropicana'],
     nightClubs: ['Cavo Paradiso', 'Alemagou', 'Interni', 'Void', 'Monastery'],
@@ -282,7 +262,6 @@ ${itinerary}`;
 
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '20px' }}>
-      {/* Barra lingua e tema */}
       <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
         {['it','en','fr','es'].map(l => (
           <button key={l} onClick={() => setLang(l)} style={{
@@ -297,7 +276,6 @@ ${itinerary}`;
         }}>{darkMode ? '☀️' : '🌙'}</button>
       </div>
 
-      {/* Header */}
       <div style={{ textAlign: 'center', marginBottom: '40px' }}>
         <h1 style={{
           fontSize: 'clamp(2rem, 5vw, 3rem)',
@@ -307,7 +285,6 @@ ${itinerary}`;
         <p style={{ color: darkMode ? '#E6EDF5' : '#1A2536', opacity: 0.8 }}>{t.subtitle}</p>
       </div>
 
-      {/* Tabs */}
       <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', marginBottom: '40px', flexWrap: 'wrap' }}>
         {['explore','planning','services'].map(tab => (
           <button key={tab} onClick={() => setActiveTab(tab)} style={{
@@ -322,7 +299,6 @@ ${itinerary}`;
         ))}
       </div>
 
-      {/* EXPLORE con card dinamiche */}
       {activeTab === 'explore' && (
         <div style={{ background: darkMode ? '#162235' : '#F3EFE9', borderRadius: '28px', padding: '24px', boxShadow: '0 8px 20px rgba(0,0,0,0.1)' }}>
           <h2 style={{ marginBottom: '20px', color: darkMode ? '#E6EDF5' : '#1A2536' }}>📆 {lang === 'it' ? 'Calendario eventi' : lang === 'en' ? 'Event Calendar' : lang === 'fr' ? 'Calendrier des événements' : 'Calendario de eventos'}</h2>
@@ -369,33 +345,40 @@ ${itinerary}`;
         </div>
       )}
 
-      {/* PLANNING */}
       {activeTab === 'planning' && (
         <div style={{ background: darkMode ? '#162235' : '#F3EFE9', borderRadius: '28px', padding: '24px', boxShadow: '0 8px 20px rgba(0,0,0,0.1)' }}>
           <h2 style={{ color: darkMode ? '#E6EDF5' : '#1A2536' }}>✍️ {lang === 'it' ? 'Crea il tuo programma' : lang === 'en' ? 'Create your program' : lang === 'fr' ? 'Créez votre programme' : 'Crea tu programa'}</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginTop: '20px' }}>
-            {['name','group','arrival','days','budget'].map((field, idx) => (
-              <div key={idx}>
-                <label style={{ fontWeight: 'bold', color: darkMode ? '#E6EDF5' : '#1A2536' }}>{t[field]}</label>
-                <small style={{ display: 'block', color: darkMode ? '#E6EDF5' : '#1A2536', opacity: 0.7 }}>{t[`${field}Desc`]}</small>
-                {field === 'name' && <input type="text" value={formData.name} onChange={e=>setFormData({...formData,name:e.target.value})} style={inputStyle(darkMode, errors.name)} />}
-                {field === 'group' && <input type="number" min="1" value={formData.groupSize} onChange={e=>setFormData({...formData,groupSize:parseInt(e.target.value)||1})} style={inputStyle(darkMode, errors.groupSize)} />}
-                {field === 'arrival' && <input type="date" value={formData.arrivalDate} onChange={e=>setFormData({...formData,arrivalDate:e.target.value})} style={inputStyle(darkMode, errors.arrivalDate)} />}
-                {field === 'days' && (
-                  <>
-                    <select value={formData.stayDays} onChange={e=>setFormData({...formData,stayDays:e.target.value})} style={selectStyle(darkMode, errors.stayDays)}>
-                      <option value="3">3</option><option value="5">5</option><option value="7">7</option><option value="10">10</option><option value="14">14</option><option value="custom">Custom</option>
-                    </select>
-                    {formData.stayDays === 'custom' && <input type="number" placeholder="#" value={formData.customDays} onChange={e=>setFormData({...formData,customDays:e.target.value})} style={{ ...inputStyle(darkMode, false), marginTop: '10px' }} />}
-                  </>
-                )}
-                {field === 'budget' && (
-                  <select value={formData.budget} onChange={e=>setFormData({...formData,budget:e.target.value})} style={selectStyle(darkMode, false)}>
-                    <option value="luxury">💰 Luxury</option><option value="mid">💵 Mid Range</option><option value="budget">🟢 Budget</option>
-                  </select>
-                )}
-              </div>
-            ))}
+            <div>
+              <label style={{ fontWeight: 'bold', color: darkMode ? '#E6EDF5' : '#1A2536' }}>{t.name}</label>
+              <small style={{ display: 'block', color: darkMode ? '#E6EDF5' : '#1A2536', opacity: 0.7 }}>{t.nameDesc}</small>
+              <input type="text" value={formData.name} onChange={e=>setFormData({...formData,name:e.target.value})} style={inputStyle(darkMode, errors.name)} />
+            </div>
+            <div>
+              <label style={{ fontWeight: 'bold', color: darkMode ? '#E6EDF5' : '#1A2536' }}>{t.group}</label>
+              <small style={{ display: 'block', color: darkMode ? '#E6EDF5' : '#1A2536', opacity: 0.7 }}>{t.groupDesc}</small>
+              <input type="number" min="1" value={formData.groupSize} onChange={e=>setFormData({...formData,groupSize:parseInt(e.target.value)||1})} style={inputStyle(darkMode, errors.groupSize)} />
+            </div>
+            <div>
+              <label style={{ fontWeight: 'bold', color: darkMode ? '#E6EDF5' : '#1A2536' }}>{t.arrival}</label>
+              <small style={{ display: 'block', color: darkMode ? '#E6EDF5' : '#1A2536', opacity: 0.7 }}>{t.arrivalDesc}</small>
+              <input type="date" value={formData.arrivalDate} onChange={e=>setFormData({...formData,arrivalDate:e.target.value})} style={inputStyle(darkMode, errors.arrivalDate)} />
+            </div>
+            <div>
+              <label style={{ fontWeight: 'bold', color: darkMode ? '#E6EDF5' : '#1A2536' }}>{t.days}</label>
+              <small style={{ display: 'block', color: darkMode ? '#E6EDF5' : '#1A2536', opacity: 0.7 }}>{t.daysDesc}</small>
+              <select value={formData.stayDays} onChange={e=>setFormData({...formData,stayDays:e.target.value})} style={selectStyle(darkMode, errors.stayDays)}>
+                <option value="3">3</option><option value="5">5</option><option value="7">7</option><option value="10">10</option><option value="14">14</option><option value="custom">Custom</option>
+              </select>
+              {formData.stayDays === 'custom' && <input type="number" placeholder="#" value={formData.customDays} onChange={e=>setFormData({...formData,customDays:e.target.value})} style={{ ...inputStyle(darkMode, false), marginTop: '10px' }} />}
+            </div>
+            <div>
+              <label style={{ fontWeight: 'bold', color: darkMode ? '#E6EDF5' : '#1A2536' }}>{t.budgetLabel}</label>
+              <small style={{ display: 'block', color: darkMode ? '#E6EDF5' : '#1A2536', opacity: 0.7 }}>{t.budgetDesc}</small>
+              <select value={formData.budget} onChange={e=>setFormData({...formData,budget:e.target.value})} style={selectStyle(darkMode, false)}>
+                <option value="luxury">💰 Luxury</option><option value="mid">💵 Mid Range</option><option value="budget">🟢 Budget</option>
+              </select>
+            </div>
             <button onClick={generateItinerary} style={{ background: darkMode ? '#38A1F3' : '#005EA6', color: 'white', border: 'none', padding: '14px', borderRadius: '48px', fontWeight: 'bold', cursor: 'pointer' }}>{t.generate}</button>
             {generatedMsg && (
               <div style={{ marginTop: '20px', background: darkMode ? '#0B131F' : 'white', padding: '20px', borderRadius: '24px', whiteSpace: 'pre-wrap', fontFamily: 'monospace', color: darkMode ? '#E6EDF5' : '#1A2536' }}>
@@ -407,7 +390,6 @@ ${itinerary}`;
         </div>
       )}
 
-      {/* SERVICES */}
       {activeTab === 'services' && (
         <div style={{ background: darkMode ? '#162235' : '#F3EFE9', borderRadius: '28px', padding: '24px', boxShadow: '0 8px 20px rgba(0,0,0,0.1)' }}>
           <h2 style={{ color: darkMode ? '#E6EDF5' : '#1A2536' }}>🏛️ {lang === 'it' ? 'Scopri Mykonos' : lang === 'en' ? 'Discover Mykonos' : lang === 'fr' ? 'Découvrez Mykonos' : 'Descubre Mykonos'}</h2>
@@ -436,7 +418,6 @@ ${itinerary}`;
   );
 }
 
-// Stili riutilizzabili
 const inputStyle = (darkMode, hasError) => ({
   width: '100%', padding: '12px', borderRadius: '48px', border: hasError ? '2px solid #E03B7B' : `1px solid ${darkMode ? '#38A1F3' : '#005EA6'}`, background: darkMode ? '#0B131F' : 'white', color: darkMode ? '#E6EDF5' : '#1A2536', fontSize: '1rem'
 });
