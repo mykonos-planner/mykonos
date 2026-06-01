@@ -26,7 +26,7 @@ export default function HomePage() {
 
   const updateBodyTheme = (isDark) => {
     document.body.style.backgroundColor = isDark ? '#0B131F' : '#FBFBFA';
-    document.body.style.color = isDark ? '#E6EDF5' : '#1A2536';
+    document.body.style.color = isDark ? '#E6EDF5' : '#0B1A2A'; // più scuro per contrasto
   };
 
   const toggleDark = () => {
@@ -262,17 +262,40 @@ export default function HomePage() {
 
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '20px' }}>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
-        {['it','en','fr','es'].map(l => (
-          <button key={l} onClick={() => setLang(l)} style={{
-            background: lang === l ? (darkMode ? '#38A1F3' : '#005EA6') : 'transparent',
-            color: lang === l ? 'white' : (darkMode ? '#E6EDF5' : '#1A2536'),
-            border: `1px solid ${darkMode ? '#38A1F3' : '#005EA6'}`,
-            borderRadius: '40px', padding: '6px 16px', cursor: 'pointer', fontWeight: lang === l ? 'bold' : 'normal'
-          }}>{l.toUpperCase()}</button>
-        ))}
+      {/* Barra lingua + tema - equispaziata su mobile */}
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        gap: '8px', 
+        marginBottom: '24px', 
+        flexWrap: 'wrap',
+        width: '100%'
+      }}>
+        <div style={{ display: 'flex', gap: '8px', flex: '1', justifyContent: 'space-evenly', flexWrap: 'wrap' }}>
+          {['it','en','fr','es'].map(l => (
+            <button key={l} onClick={() => setLang(l)} style={{
+              background: lang === l ? (darkMode ? '#38A1F3' : '#005EA6') : 'transparent',
+              color: lang === l ? 'white' : (darkMode ? '#E6EDF5' : '#0B1A2A'),
+              border: `1px solid ${darkMode ? '#38A1F3' : '#005EA6'}`,
+              borderRadius: '40px', 
+              padding: '6px 16px', 
+              cursor: 'pointer', 
+              fontWeight: lang === l ? 'bold' : 'normal',
+              flex: '1',
+              textAlign: 'center',
+              minWidth: '60px'
+            }}>{l.toUpperCase()}</button>
+          ))}
+        </div>
         <button onClick={toggleDark} style={{
-          background: darkMode ? '#F4A261' : '#E03B7B', color: 'white', border: 'none', borderRadius: '40px', padding: '6px 16px', cursor: 'pointer'
+          background: darkMode ? '#F4A261' : '#E03B7B', 
+          color: 'white', 
+          border: 'none', 
+          borderRadius: '40px', 
+          padding: '6px 16px', 
+          cursor: 'pointer',
+          minWidth: '60px'
         }}>{darkMode ? '☀️' : '🌙'}</button>
       </div>
 
@@ -282,14 +305,14 @@ export default function HomePage() {
           color: darkMode ? '#38A1F3' : '#005EA6',
           marginBottom: '8px'
         }}>🏝️ Mykonos Planning</h1>
-        <p style={{ color: darkMode ? '#E6EDF5' : '#1A2536', opacity: 0.8 }}>{t.subtitle}</p>
+        <p style={{ color: darkMode ? '#E6EDF5' : '#0B1A2A', opacity: 0.9 }}>{t.subtitle}</p>
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', marginBottom: '40px', flexWrap: 'wrap' }}>
         {['explore','planning','services'].map(tab => (
           <button key={tab} onClick={() => setActiveTab(tab)} style={{
             background: activeTab === tab ? (darkMode ? '#38A1F3' : '#005EA6') : (darkMode ? '#162235' : '#F3EFE9'),
-            color: activeTab === tab ? 'white' : (darkMode ? '#E6EDF5' : '#1A2536'),
+            color: activeTab === tab ? 'white' : (darkMode ? '#E6EDF5' : '#0B1A2A'),
             border: 'none', padding: '10px 24px', borderRadius: '40px', fontWeight: 'bold', cursor: 'pointer'
           }}>
             {tab === 'explore' && t.explore}
@@ -300,11 +323,11 @@ export default function HomePage() {
       </div>
 
       {activeTab === 'explore' && (
-        <div style={{ background: darkMode ? '#162235' : '#F3EFE9', borderRadius: '28px', padding: '24px', boxShadow: '0 8px 20px rgba(0,0,0,0.1)' }}>
-          <h2 style={{ marginBottom: '20px', color: darkMode ? '#E6EDF5' : '#1A2536' }}>📆 {lang === 'it' ? 'Calendario eventi' : lang === 'en' ? 'Event Calendar' : lang === 'fr' ? 'Calendrier des événements' : 'Calendario de eventos'}</h2>
+        <div style={{ background: darkMode ? '#162235' : '#F3EFE9', borderRadius: '28px', padding: '24px', boxShadow: '0 8px 20px rgba(0,0,0,0.15)' }}>
+          <h2 style={{ marginBottom: '20px', color: darkMode ? '#E6EDF5' : '#0B1A2A' }}>📆 {lang === 'it' ? 'Calendario eventi' : lang === 'en' ? 'Event Calendar' : lang === 'fr' ? 'Calendrier des événements' : 'Calendario de eventos'}</h2>
           <div style={{ display: 'flex', gap: '16px', marginBottom: '24px', flexWrap: 'wrap' }}>
             <select value={filterCategory} onChange={e => setFilterCategory(e.target.value)} style={{
-              padding: '8px 16px', borderRadius: '40px', background: darkMode ? '#0B131F' : 'white', border: `1px solid ${darkMode ? '#38A1F3' : '#005EA6'}`, color: darkMode ? '#E6EDF5' : '#1A2536'
+              padding: '8px 16px', borderRadius: '40px', background: darkMode ? '#0B131F' : 'white', border: `1px solid ${darkMode ? '#38A1F3' : '#005EA6'}`, color: darkMode ? '#E6EDF5' : '#0B1A2A'
             }}>
               <option value="all">{t.all} categorie</option>
               <option value="Night Club">{t.categories['Night Club']}</option>
@@ -313,27 +336,27 @@ export default function HomePage() {
               <option value="Boat Party">{t.categories['Boat Party']}</option>
             </select>
             <select value={filterVenue} onChange={e => setFilterVenue(e.target.value)} style={{
-              padding: '8px 16px', borderRadius: '40px', background: darkMode ? '#0B131F' : 'white', border: `1px solid ${darkMode ? '#38A1F3' : '#005EA6'}`, color: darkMode ? '#E6EDF5' : '#1A2536'
+              padding: '8px 16px', borderRadius: '40px', background: darkMode ? '#0B131F' : 'white', border: `1px solid ${darkMode ? '#38A1F3' : '#005EA6'}`, color: darkMode ? '#E6EDF5' : '#0B1A2A'
             }}>
               <option value="all">{t.all} locali</option>
               {uniqueVenues.map(v => <option key={v} value={v}>{v}</option>)}
             </select>
           </div>
           {filteredEvents.length === 0 ? (
-            <p style={{ textAlign: 'center', color: darkMode ? '#E6EDF5' : '#1A2536' }}>Nessun evento trovato.</p>
+            <p style={{ textAlign: 'center', color: darkMode ? '#E6EDF5' : '#0B1A2A' }}>Nessun evento trovato.</p>
           ) : (
             (() => {
               const sorted = [...filteredEvents].sort((a,b)=>new Date(a.date)-new Date(b.date));
               const grouped = groupEventsByMonth(sorted);
               return Object.keys(grouped).map(month => (
                 <div key={month} style={{ marginBottom: '32px' }}>
-                  <h3 style={{ fontSize: '1.5rem', borderLeft: `4px solid ${darkMode ? '#F4A261' : '#E03B7B'}`, paddingLeft: '12px', marginBottom: '16px', color: darkMode ? '#E6EDF5' : '#1A2536' }}>{month}</h3>
+                  <h3 style={{ fontSize: '1.5rem', borderLeft: `4px solid ${darkMode ? '#F4A261' : '#E03B7B'}`, paddingLeft: '12px', marginBottom: '16px', color: darkMode ? '#E6EDF5' : '#0B1A2A' }}>{month}</h3>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px,1fr))', gap: '16px' }}>
                     {grouped[month].map(ev => (
-                      <div key={ev.id} style={{ background: darkMode ? '#0B131F' : 'white', borderRadius: '20px', padding: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', borderBottom: `2px solid ${darkMode ? '#38A1F3' : '#005EA6'}` }}>
-                        <div style={{ fontSize: '0.9rem', color: darkMode ? '#E6EDF5' : '#1A2536', fontWeight: 'bold', marginBottom: '8px' }}>{ev.date}</div>
+                      <div key={ev.id} style={{ background: darkMode ? '#0B131F' : 'white', borderRadius: '20px', padding: '16px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', borderBottom: `2px solid ${darkMode ? '#38A1F3' : '#005EA6'}` }}>
+                        <div style={{ fontSize: '0.9rem', color: darkMode ? '#E6EDF5' : '#0B1A2A', fontWeight: 'bold', marginBottom: '8px' }}>{ev.date}</div>
                         <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: darkMode ? '#38A1F3' : '#005EA6', marginBottom: '6px' }}>{ev.name}</div>
-                        <div style={{ color: darkMode ? '#E6EDF5' : '#1A2536', opacity: 0.7 }}>{ev.venue}</div>
+                        <div style={{ color: darkMode ? '#E6EDF5' : '#0B1A2A', opacity: 0.8 }}>{ev.venue}</div>
                         <div style={{ marginTop: '8px', display: 'inline-block', background: darkMode ? '#F4A26120' : '#E03B7B20', padding: '4px 12px', borderRadius: '20px', fontSize: '0.75rem', color: darkMode ? '#F4A261' : '#E03B7B' }}>{t.categories[ev.category] || ev.category}</div>
                       </div>
                     ))}
@@ -347,41 +370,41 @@ export default function HomePage() {
 
       {activeTab === 'planning' && (
         <div style={{ background: darkMode ? '#162235' : '#F3EFE9', borderRadius: '28px', padding: '24px', boxShadow: '0 8px 20px rgba(0,0,0,0.1)' }}>
-          <h2 style={{ color: darkMode ? '#E6EDF5' : '#1A2536' }}>✍️ {lang === 'it' ? 'Crea il tuo programma' : lang === 'en' ? 'Create your program' : lang === 'fr' ? 'Créez votre programme' : 'Crea tu programa'}</h2>
+          <h2 style={{ color: darkMode ? '#E6EDF5' : '#0B1A2A' }}>✍️ {lang === 'it' ? 'Crea il tuo programma' : lang === 'en' ? 'Create your program' : lang === 'fr' ? 'Créez votre programme' : 'Crea tu programa'}</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginTop: '20px' }}>
             <div>
-              <label style={{ fontWeight: 'bold', color: darkMode ? '#E6EDF5' : '#1A2536' }}>{t.name}</label>
-              <small style={{ display: 'block', color: darkMode ? '#E6EDF5' : '#1A2536', opacity: 0.7 }}>{t.nameDesc}</small>
+              <label style={{ fontWeight: 'bold', color: darkMode ? '#E6EDF5' : '#0B1A2A' }}>{t.name}</label>
+              <small style={{ display: 'block', color: darkMode ? '#E6EDF5' : '#0B1A2A', opacity: 0.9 }}>{t.nameDesc}</small>
               <input type="text" value={formData.name} onChange={e=>setFormData({...formData,name:e.target.value})} style={inputStyle(darkMode, errors.name)} />
             </div>
             <div>
-              <label style={{ fontWeight: 'bold', color: darkMode ? '#E6EDF5' : '#1A2536' }}>{t.group}</label>
-              <small style={{ display: 'block', color: darkMode ? '#E6EDF5' : '#1A2536', opacity: 0.7 }}>{t.groupDesc}</small>
+              <label style={{ fontWeight: 'bold', color: darkMode ? '#E6EDF5' : '#0B1A2A' }}>{t.group}</label>
+              <small style={{ display: 'block', color: darkMode ? '#E6EDF5' : '#0B1A2A', opacity: 0.9 }}>{t.groupDesc}</small>
               <input type="number" min="1" value={formData.groupSize} onChange={e=>setFormData({...formData,groupSize:parseInt(e.target.value)||1})} style={inputStyle(darkMode, errors.groupSize)} />
             </div>
             <div>
-              <label style={{ fontWeight: 'bold', color: darkMode ? '#E6EDF5' : '#1A2536' }}>{t.arrival}</label>
-              <small style={{ display: 'block', color: darkMode ? '#E6EDF5' : '#1A2536', opacity: 0.7 }}>{t.arrivalDesc}</small>
+              <label style={{ fontWeight: 'bold', color: darkMode ? '#E6EDF5' : '#0B1A2A' }}>{t.arrival}</label>
+              <small style={{ display: 'block', color: darkMode ? '#E6EDF5' : '#0B1A2A', opacity: 0.9 }}>{t.arrivalDesc}</small>
               <input type="date" value={formData.arrivalDate} onChange={e=>setFormData({...formData,arrivalDate:e.target.value})} style={inputStyle(darkMode, errors.arrivalDate)} />
             </div>
             <div>
-              <label style={{ fontWeight: 'bold', color: darkMode ? '#E6EDF5' : '#1A2536' }}>{t.days}</label>
-              <small style={{ display: 'block', color: darkMode ? '#E6EDF5' : '#1A2536', opacity: 0.7 }}>{t.daysDesc}</small>
+              <label style={{ fontWeight: 'bold', color: darkMode ? '#E6EDF5' : '#0B1A2A' }}>{t.days}</label>
+              <small style={{ display: 'block', color: darkMode ? '#E6EDF5' : '#0B1A2A', opacity: 0.9 }}>{t.daysDesc}</small>
               <select value={formData.stayDays} onChange={e=>setFormData({...formData,stayDays:e.target.value})} style={selectStyle(darkMode, errors.stayDays)}>
                 <option value="3">3</option><option value="5">5</option><option value="7">7</option><option value="10">10</option><option value="14">14</option><option value="custom">Custom</option>
               </select>
               {formData.stayDays === 'custom' && <input type="number" placeholder="#" value={formData.customDays} onChange={e=>setFormData({...formData,customDays:e.target.value})} style={{ ...inputStyle(darkMode, false), marginTop: '10px' }} />}
             </div>
             <div>
-              <label style={{ fontWeight: 'bold', color: darkMode ? '#E6EDF5' : '#1A2536' }}>{t.budgetLabel}</label>
-              <small style={{ display: 'block', color: darkMode ? '#E6EDF5' : '#1A2536', opacity: 0.7 }}>{t.budgetDesc}</small>
+              <label style={{ fontWeight: 'bold', color: darkMode ? '#E6EDF5' : '#0B1A2A' }}>{t.budgetLabel}</label>
+              <small style={{ display: 'block', color: darkMode ? '#E6EDF5' : '#0B1A2A', opacity: 0.9 }}>{t.budgetDesc}</small>
               <select value={formData.budget} onChange={e=>setFormData({...formData,budget:e.target.value})} style={selectStyle(darkMode, false)}>
                 <option value="luxury">💰 Luxury</option><option value="mid">💵 Mid Range</option><option value="budget">🟢 Budget</option>
               </select>
             </div>
             <button onClick={generateItinerary} style={{ background: darkMode ? '#38A1F3' : '#005EA6', color: 'white', border: 'none', padding: '14px', borderRadius: '48px', fontWeight: 'bold', cursor: 'pointer' }}>{t.generate}</button>
             {generatedMsg && (
-              <div style={{ marginTop: '20px', background: darkMode ? '#0B131F' : 'white', padding: '20px', borderRadius: '24px', whiteSpace: 'pre-wrap', fontFamily: 'monospace', color: darkMode ? '#E6EDF5' : '#1A2536' }}>
+              <div style={{ marginTop: '20px', background: darkMode ? '#0B131F' : 'white', padding: '20px', borderRadius: '24px', whiteSpace: 'pre-wrap', fontFamily: 'monospace', color: darkMode ? '#E6EDF5' : '#0B1A2A' }}>
                 {generatedMsg}
                 <button onClick={()=>{navigator.clipboard.writeText(generatedMsg); alert('Copiato!');}} style={{ marginTop: '12px', background: '#E03B7B', color: 'white', padding: '8px 20px', borderRadius: '40px', border: 'none', cursor: 'pointer' }}>{t.copy}</button>
               </div>
@@ -392,26 +415,26 @@ export default function HomePage() {
 
       {activeTab === 'services' && (
         <div style={{ background: darkMode ? '#162235' : '#F3EFE9', borderRadius: '28px', padding: '24px', boxShadow: '0 8px 20px rgba(0,0,0,0.1)' }}>
-          <h2 style={{ color: darkMode ? '#E6EDF5' : '#1A2536' }}>🏛️ {lang === 'it' ? 'Scopri Mykonos' : lang === 'en' ? 'Discover Mykonos' : lang === 'fr' ? 'Découvrez Mykonos' : 'Descubre Mykonos'}</h2>
+          <h2 style={{ color: darkMode ? '#E6EDF5' : '#0B1A2A' }}>🏛️ {lang === 'it' ? 'Scopri Mykonos' : lang === 'en' ? 'Discover Mykonos' : lang === 'fr' ? 'Découvrez Mykonos' : 'Descubre Mykonos'}</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px,1fr))', gap: '24px', marginTop: '24px' }}>
-            <div style={{ background: darkMode ? '#0B131F' : 'white', borderRadius: '20px', padding: '16px' }}>
+            <div style={{ background: darkMode ? '#0B131F' : 'white', borderRadius: '20px', padding: '16px', boxShadow: '0 4px 10px rgba(0,0,0,0.05)' }}>
               <h3 style={{ color: darkMode ? '#38A1F3' : '#005EA6', marginBottom: '12px' }}>🏖️ {t.beachClubs}</h3>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>{servicesData.beachClubs.map(c => <li key={c} style={{ marginBottom: '8px', color: darkMode ? '#E6EDF5' : '#1A2536' }}>🌊 {c}</li>)}</ul>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>{servicesData.beachClubs.map(c => <li key={c} style={{ marginBottom: '8px', color: darkMode ? '#E6EDF5' : '#0B1A2A' }}>🌊 {c}</li>)}</ul>
             </div>
-            <div style={{ background: darkMode ? '#0B131F' : 'white', borderRadius: '20px', padding: '16px' }}>
+            <div style={{ background: darkMode ? '#0B131F' : 'white', borderRadius: '20px', padding: '16px', boxShadow: '0 4px 10px rgba(0,0,0,0.05)' }}>
               <h3 style={{ color: darkMode ? '#38A1F3' : '#005EA6', marginBottom: '12px' }}>🎧 {t.nightClubs}</h3>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>{servicesData.nightClubs.map(c => <li key={c} style={{ marginBottom: '8px', color: darkMode ? '#E6EDF5' : '#1A2536' }}>🎵 {c}</li>)}</ul>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>{servicesData.nightClubs.map(c => <li key={c} style={{ marginBottom: '8px', color: darkMode ? '#E6EDF5' : '#0B1A2A' }}>🎵 {c}</li>)}</ul>
             </div>
-            <div style={{ background: darkMode ? '#0B131F' : 'white', borderRadius: '20px', padding: '16px' }}>
+            <div style={{ background: darkMode ? '#0B131F' : 'white', borderRadius: '20px', padding: '16px', boxShadow: '0 4px 10px rgba(0,0,0,0.05)' }}>
               <h3 style={{ color: darkMode ? '#38A1F3' : '#005EA6', marginBottom: '12px' }}>🍽️ {t.restaurants}</h3>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>{servicesData.restaurants.map(c => <li key={c} style={{ marginBottom: '8px', color: darkMode ? '#E6EDF5' : '#1A2536' }}>🍴 {c}</li>)}</ul>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>{servicesData.restaurants.map(c => <li key={c} style={{ marginBottom: '8px', color: darkMode ? '#E6EDF5' : '#0B1A2A' }}>🍴 {c}</li>)}</ul>
             </div>
-            <div style={{ background: darkMode ? '#0B131F' : 'white', borderRadius: '20px', padding: '16px' }}>
+            <div style={{ background: darkMode ? '#0B131F' : 'white', borderRadius: '20px', padding: '16px', boxShadow: '0 4px 10px rgba(0,0,0,0.05)' }}>
               <h3 style={{ color: darkMode ? '#38A1F3' : '#005EA6', marginBottom: '12px' }}>⚡ {t.extras}</h3>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>{servicesData.extras.map(c => <li key={c} style={{ marginBottom: '8px', color: darkMode ? '#E6EDF5' : '#1A2536' }}>🚤 {c}</li>)}</ul>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>{servicesData.extras.map(c => <li key={c} style={{ marginBottom: '8px', color: darkMode ? '#E6EDF5' : '#0B1A2A' }}>🚤 {c}</li>)}</ul>
             </div>
           </div>
-          <p style={{ marginTop: '24px', color: darkMode ? '#E6EDF5' : '#1A2536', opacity: 0.7, fontSize: '0.9rem', textAlign: 'center' }}>💡 Per prenotazioni e disponibilità, contattami su WhatsApp!</p>
+          <p style={{ marginTop: '24px', color: darkMode ? '#E6EDF5' : '#0B1A2A', opacity: 0.8, fontSize: '0.9rem', textAlign: 'center' }}>💡 Per prenotazioni e disponibilità, contattami su WhatsApp!</p>
         </div>
       )}
     </div>
@@ -419,9 +442,23 @@ export default function HomePage() {
 }
 
 const inputStyle = (darkMode, hasError) => ({
-  width: '100%', padding: '12px', borderRadius: '48px', border: hasError ? '2px solid #E03B7B' : `1px solid ${darkMode ? '#38A1F3' : '#005EA6'}`, background: darkMode ? '#0B131F' : 'white', color: darkMode ? '#E6EDF5' : '#1A2536', fontSize: '1rem'
+  width: '100%',
+  padding: '12px',
+  borderRadius: '48px',
+  border: hasError ? '2px solid #E03B7B' : `1px solid ${darkMode ? '#38A1F3' : '#005EA6'}`,
+  background: darkMode ? '#0B131F' : 'white',
+  color: darkMode ? '#E6EDF5' : '#0B1A2A',
+  fontSize: '1rem',
+  boxSizing: 'border-box'  // risolve lo sforamento
 });
 
 const selectStyle = (darkMode, hasError) => ({
-  width: '100%', padding: '12px', borderRadius: '48px', border: hasError ? '2px solid #E03B7B' : `1px solid ${darkMode ? '#38A1F3' : '#005EA6'}`, background: darkMode ? '#0B131F' : 'white', color: darkMode ? '#E6EDF5' : '#1A2536', fontSize: '1rem'
+  width: '100%',
+  padding: '12px',
+  borderRadius: '48px',
+  border: hasError ? '2px solid #E03B7B' : `1px solid ${darkMode ? '#38A1F3' : '#005EA6'}`,
+  background: darkMode ? '#0B131F' : 'white',
+  color: darkMode ? '#E6EDF5' : '#0B1A2A',
+  fontSize: '1rem',
+  boxSizing: 'border-box'  // risolve lo sforamento
 });
