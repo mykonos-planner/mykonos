@@ -14,6 +14,7 @@ export default function HomePage() {
   const [darkMode, setDarkMode] = useState(false);
   const [filterCategory, setFilterCategory] = useState('all');
   const [filterVenue, setFilterVenue] = useState('all');
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     fetch('/api/events')
@@ -22,11 +23,15 @@ export default function HomePage() {
     const savedDark = localStorage.getItem('darkMode') === 'true';
     setDarkMode(savedDark);
     updateBodyTheme(savedDark);
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   const updateBodyTheme = (isDark) => {
     document.body.style.backgroundColor = isDark ? '#0B131F' : '#FBFBFA';
-    document.body.style.color = isDark ? '#E6EDF5' : '#0B1A2A'; // più scuro per contrasto
+    document.body.style.color = isDark ? '#E6EDF5' : '#0B1A2A';
   };
 
   const toggleDark = () => {
@@ -262,17 +267,24 @@ export default function HomePage() {
 
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '20px' }}>
-      {/* Barra lingua + tema - equispaziata su mobile */}
+      {/* Barra lingua e tema - adattiva */}
       <div style={{ 
         display: 'flex', 
-        justifyContent: 'space-between', 
+        justifyContent: isMobile ? 'space-between' : 'flex-end', 
         alignItems: 'center', 
-        gap: '8px', 
+        gap: '12px', 
         marginBottom: '24px', 
         flexWrap: 'wrap',
         width: '100%'
       }}>
-        <div style={{ display: 'flex', gap: '8px', flex: '1', justifyContent: 'space-evenly', flexWrap: 'wrap' }}>
+        <div style={{ 
+          display: 'flex', 
+          gap: '8px', 
+          flex: isMobile ? 1 : 'none', 
+          justifyContent: isMobile ? 'space-evenly' : 'flex-end', 
+          flexWrap: 'wrap',
+          width: isMobile ? '100%' : 'auto'
+        }}>
           {['it','en','fr','es'].map(l => (
             <button key={l} onClick={() => setLang(l)} style={{
               background: lang === l ? (darkMode ? '#38A1F3' : '#005EA6') : 'transparent',
@@ -282,9 +294,7 @@ export default function HomePage() {
               padding: '6px 16px', 
               cursor: 'pointer', 
               fontWeight: lang === l ? 'bold' : 'normal',
-              flex: '1',
-              textAlign: 'center',
-              minWidth: '60px'
+              textAlign: 'center'
             }}>{l.toUpperCase()}</button>
           ))}
         </div>
@@ -294,8 +304,7 @@ export default function HomePage() {
           border: 'none', 
           borderRadius: '40px', 
           padding: '6px 16px', 
-          cursor: 'pointer',
-          minWidth: '60px'
+          cursor: 'pointer'
         }}>{darkMode ? '☀️' : '🌙'}</button>
       </div>
 
@@ -449,7 +458,7 @@ const inputStyle = (darkMode, hasError) => ({
   background: darkMode ? '#0B131F' : 'white',
   color: darkMode ? '#E6EDF5' : '#0B1A2A',
   fontSize: '1rem',
-  boxSizing: 'border-box'  // risolve lo sforamento
+  boxSizing: 'border-box'
 });
 
 const selectStyle = (darkMode, hasError) => ({
@@ -460,5 +469,5 @@ const selectStyle = (darkMode, hasError) => ({
   background: darkMode ? '#0B131F' : 'white',
   color: darkMode ? '#E6EDF5' : '#0B1A2A',
   fontSize: '1rem',
-  boxSizing: 'border-box'  // risolve lo sforamento
+  boxSizing: 'border-box'
 });
