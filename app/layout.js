@@ -8,10 +8,10 @@ export default function RootLayout({ children }) {
     <html lang="it">
       <body style={{
         margin: 0,
-        backgroundColor: '#e6f0f5',
-        fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+        backgroundColor: '#f0f7f4',
+        fontFamily: '"Poppins", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
         color: '#1e2a3e',
-        transition: 'background-color 0.3s, color 0.3s'
+        transition: 'background-color 0.3s ease, color 0.3s ease'
       }}>
         {children}
       </body>
