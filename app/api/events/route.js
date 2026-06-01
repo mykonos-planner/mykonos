@@ -16,12 +16,9 @@ export async function GET() {
 
 export async function POST(request) {
   const body = await request.json();
-  const { secret, action, event } = body;
+  const { action, event } = body;
   
-  // PASSWORD FISSA PER TEST: "test123"
-  if (secret !== 'test123') {
-    return Response.json({ error: 'Non autorizzato' }, { status: 403 });
-  }
+  // NESSUN CONTROLLO PASSWORD - TUTTI POSSONO SCRIVERE (SOLO PER TEST)
   
   if (action === 'add') {
     const newEvent = {
