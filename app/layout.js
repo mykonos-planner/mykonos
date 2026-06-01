@@ -1,5 +1,3 @@
-import ThemeToggle from './components/ThemeToggle';
-
 export const metadata = {
   title: 'Mykonos Promoter',
   description: 'Pianifica la tua vacanza a Mykonos',
@@ -14,7 +12,6 @@ export default function RootLayout({ children }) {
         fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
         color: '#1e2a3e'
       }}>
-        <ThemeToggle />
         {children}
       </body>
     </html>
