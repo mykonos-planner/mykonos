@@ -40,6 +40,10 @@ export default function HomePage() {
   // Traduzioni complete (incluso sottotitolo)
   const translations = {
     it: {
+      morningLabel: 'Mattina/Pomeriggio',
+      mealLabel: 'Pranzo/Cena',
+      eveningLabel: 'Serata',
+      extraLabel: 'Extra',
       explore: '📅 Eventi',
       planning: '✍️ Planning',
       services: '🏖️ Locali & Servizi',
@@ -67,6 +71,10 @@ export default function HomePage() {
       dayNames: ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato']
     },
     en: {
+      morningLabel: 'Morning/Afternoon', 
+      mealLabel: 'Lunch/Dinner', 
+      eveningLabel: 'Evening', 
+      extraLabel: 'Extra',
       explore: '📅 Events',
       planning: '✍️ Planning',
       services: '🏖️ Venues & Services',
@@ -94,6 +102,10 @@ export default function HomePage() {
       dayNames: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
     },
     fr: {
+      morningLabel: 'Matin/Après-midi', 
+      mealLabel: 'Déjeuner/Dîner', 
+      eveningLabel: 'Soirée', 
+      extraLabel: 'Extra',
       explore: '📅 Événements',
       planning: '✍️ Planification',
       services: '🏖️ Lieux & Services',
@@ -121,6 +133,10 @@ export default function HomePage() {
       dayNames: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi']
     },
     es: {
+      morningLabel: 'Mañana/Tarde', 
+      mealLabel: 'Comida/Cena', 
+      eveningLabel: 'Noche', 
+      extraLabel: 'Extra',
       explore: '📅 Eventos',
       planning: '✍️ Planificación',
       services: '🏖️ Lugares & Servicios',
@@ -231,27 +247,23 @@ export default function HomePage() {
       const availableExtras = extrasList.filter(filterByBudget);
       const extraSuggestion = availableExtras.length > 0 ? availableExtras[i % availableExtras.length].name : 'Relax in hotel';
       
-      itinerary += `\n📅 **${dayOfWeek} ${formattedDate}**\n`;
-      itinerary += `   ☀️ Mattina/Pomeriggio: ${beachSuggestion}\n`;
-      itinerary += `   🍽️ Pranzo/Cena: ${restaurantSuggestion}\n`;
-      itinerary += `   🎧 Serata: ${musicSuggestion}\n`;
-      itinerary += `   ⚡ Extra: ${extraSuggestion}\n`;
+      itinerary += `\n📅 ${dayOfWeek} ${formattedDate}\n`;
+      itinerary += `   ☀️ ${t.morningLabel}: ${beachSuggestion}\n`;
+      itinerary += `   🍽️ ${t.mealLabel}: ${restaurantSuggestion}\n`;
+      itinerary += `   🎧 ${t.eveningLabel}: ${musicSuggestion}\n`;
+      itinerary += `   ⚡ ${t.extraLabel}: ${extraSuggestion}\n`;
     }
     
-    const msg = `🏝️ *MYKONOS PLANNING* 🏝️
+       const msg = `🏝️ MYKONOS PLANNING 🏝️
 ━━━━━━━━━━━━━━━━━━
-👤 *${t.name}:* ${formData.name}
-👥 *${t.group}:* ${formData.groupSize}
-📅 *${t.arrival}:* ${formData.arrivalDate}
-⏱️ *${t.days}:* ${days}
-💰 *${t.budgetLabel}:* ${formData.budget === 'luxury' ? 'Luxury' : formData.budget === 'mid' ? 'Mid Range' : 'Budget'}
+👤 ${t.name}: ${formData.name}
+👥 ${t.group}: ${formData.groupSize}
+📅 ${t.arrival}: ${formData.arrivalDate}
+⏱️ ${t.days}: ${days}
+💰 ${t.budgetLabel}: ${formData.budget === 'luxury' ? 'Luxury' : formData.budget === 'mid' ? 'Mid Range' : 'Budget'}
 
-✨ *ITINERARIO PERSONALIZZATO* ✨
-${itinerary}
-🔹 Per prenotazioni e maggiori dettagli, contattami su WhatsApp.`;
-    setGeneratedMsg(msg);
-  };
-
+${itinerary}`;
+    
   // Filtri per la visualizzazione eventi
   const uniqueVenues = [...new Set(events.map(ev => ev.venue).filter(Boolean))];
   const filteredEvents = events.filter(ev => {
