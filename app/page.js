@@ -542,11 +542,17 @@ export default function HomePage() {
                 <label style={{ fontWeight: 'bold', color: darkMode ? '#E6EDF5' : lightText, fontSize: isMobile ? '0.9rem' : '1rem' }}>{t.arrival}</label>
                 <small style={{ display: 'block', color: darkMode ? '#E6EDF5' : lightTextMuted, fontSize: isMobile ? '0.8rem' : '0.9rem' }}>{t.arrivalDesc}</small>
                 <input 
-                  type="text" 
-                  placeholder="YYYY-MM-DD (es. 2026-06-02)"
+                  type="date" 
                   value={formData.arrivalDate} 
                   onChange={e=>setFormData({...formData,arrivalDate:e.target.value})} 
-                  style={inputStyle(darkMode, errors.arrivalDate, darkMode ? accentBlue : lightPrimary, isMobile)}
+                  style={{
+                    ...inputStyle(darkMode, errors.arrivalDate, darkMode ? accentBlue : lightPrimary, isMobile),
+                    minWidth: '0',
+                    width: '100%',
+                    fontSize: '16px',
+                    WebkitAppearance: 'none',
+                    appearance: 'none'
+                  }} 
                 />
               </div>
               <div>
