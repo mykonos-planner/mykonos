@@ -266,6 +266,7 @@ export default function HomePage() {
     if (isNaN(days)) days = 7;
     const startDate = new Date(formData.arrivalDate);
     const budgetLevel = formData.budget;
+    const groupNum = parseInt(formData.groupSize) || 1;
 
     const endDate = new Date(startDate);
     endDate.setDate(startDate.getDate() + days - 1);
@@ -274,20 +275,18 @@ export default function HomePage() {
       return evDate >= startDate && evDate <= endDate;
     });
 
-    // Definizione delle liste in base al budget
     let musicEvents = eventsInRange.filter(ev => ev.category === 'Night Club' || ev.type === 'event');
     let restaurantsList = events.filter(ev => ev.type === 'restaurant');
     let beachesList = events.filter(ev => ev.type === 'beach');
     let extrasList = events.filter(ev => ev.type === 'extra' && ev.serviceType !== 'scooter' && ev.serviceType !== 'car');
 
-    // Filtro per budget
     const filterByBudget = (item) => {
-      if (!item.budget) return true; // se non specificato, lo includiamo in tutti? Per sicurezza lo includiamo solo per mid? Meglio assegnare un default 'mid' nei dati.
+      if (!item.budget) return true;
       if (budgetLevel === 'budget') {
         return item.budget === 'budget' || item.budget === 'mid';
       } else if (budgetLevel === 'mid') {
         return item.budget === 'mid';
-      } else { // luxury
+      } else {
         return item.budget === 'luxury';
       }
     };
@@ -300,6 +299,14 @@ export default function HomePage() {
       extrasList = [];
     } else {
       extrasList = extrasList.filter(filterByBudget);
+      // Filtra extra per numero di persone
+      extrasList = extrasList.filter(extra => {
+        const min = extra.minPersons;
+        const max = extra.maxPersons;
+        if (min && groupNum < min) return false;
+        if (max && groupNum > max) return false;
+        return true;
+      });
     }
 
     let itinerary = '';
@@ -341,8 +348,13 @@ export default function HomePage() {
       
       let extraLine = '';
       if (budgetLevel !== 'budget' && extrasList.length > 0) {
-        const extraSuggestion = extrasList[i % extrasList.length].name;
-        extraLine = `\n   ⚡ ${t.extraLabel}: ${extraSuggestion}`;
+        const selectedExtra = extrasList[i % extrasList.length];
+        let extraText = selectedExtra.name;
+        const req = [];
+        if (selectedExtra.minPersons) req.push(`min. ${selectedExtra.minPersons} persone`);
+        if (selectedExtra.maxPersons) req.push(`max. ${selectedExtra.maxPersons} persone`);
+        if (req.length) extraText += ` (${req.join(', ')})`;
+        extraLine = `\n   ⚡ ${t.extraLabel}: ${extraText}`;
       } else if (budgetLevel !== 'budget' && extrasList.length === 0) {
         extraLine = `\n   ⚡ ${t.extraLabel}: Relax in hotel`;
       }
@@ -356,7 +368,6 @@ export default function HomePage() {
       itinerary += `\n`;
     }
     
-    const groupNum = parseInt(formData.groupSize) || 1;
     const msg = `🏝️ MYKONOS PLANNING 🏝️\n━━━━━━━━━━━━━━━━━━\n👤 ${t.name}: ${formData.name}\n👥 ${t.group}: ${groupNum}\n📅 ${t.arrival}: ${formData.arrivalDate}\n⏱️ ${t.days}: ${days}\n💰 ${t.budgetLabel}: ${formData.budget === 'luxury' ? 'Luxury' : formData.budget === 'mid' ? 'Mid Range' : 'Budget'}\n${itinerary}`;
     setGeneratedMsg(msg);
   };
