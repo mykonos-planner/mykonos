@@ -4,15 +4,14 @@ import { Redis } from '@upstash/redis';
 
 let redisClient = null;
 function getRedis() {
-  if (!redisClient) {
-    const url = process.env.KV_URL;
-    const token = process.env.KV_REST_API_TOKEN;
-    if (!url || !token) {
-      console.error('Redis credentials missing: KV_URL or KV_REST_API_TOKEN');
-      return null;
-    }
-    redisClient = new Redis({ url, token });
+  if (redisClient) return redisClient;
+  const url = process.env.KV_URL;
+  const token = process.env.KV_REST_API_TOKEN;
+  if (!url || !token) {
+    console.warn('Redis credentials missing');
+    return null;
   }
+  redisClient = new Redis({ url, token });
   return redisClient;
 }
 
@@ -20,15 +19,14 @@ export async function GET() {
   try {
     const redis = getRedis();
     if (!redis) {
-      return Response.json({ events: [], error: 'Redis non configurato' }, { status: 500 });
+      return Response.json({ events: [] });
     }
     let events = await redis.lrange('events', 0, -1);
-    if (!events) events = [];
-    events = events.map(e => typeof e === 'string' ? JSON.parse(e) : e);
+    events = (events || []).map(e => typeof e === 'string' ? JSON.parse(e) : e);
     return Response.json({ events });
   } catch (error) {
     console.error('Redis GET error:', error);
-    return Response.json({ events: [], error: error.message }, { status: 500 });
+    return Response.json({ events: [] });
   }
 }
 
@@ -36,18 +34,16 @@ export async function POST(request) {
   try {
     const redis = getRedis();
     if (!redis) {
-      return Response.json({ error: 'Redis non configurato' }, { status: 500 });
+      return Response.json({ error: 'Redis non configurato, contatta l\'amministratore' }, { status: 500 });
     }
     const body = await request.json();
     const { secret, action, event } = body;
-    
     const adminSecret = process.env.ADMIN_SECRET;
     const isAuthorized = adminSecret && secret === adminSecret;
     
     if (action === 'auth') {
       return Response.json({ success: isAuthorized });
     }
-    
     if (!isAuthorized) {
       return Response.json({ error: 'Non autorizzato' }, { status: 403 });
     }
@@ -56,7 +52,6 @@ export async function POST(request) {
       if (!event.name) {
         return Response.json({ error: 'Il nome è obbligatorio' }, { status: 400 });
       }
-      
       const newEvent = {
         id: Date.now().toString(),
         name: event.name,
@@ -71,7 +66,6 @@ export async function POST(request) {
         ...(event.location && { location: event.location }),
         ...(event.type && { type: event.type })
       };
-      
       await redis.rpush('events', JSON.stringify(newEvent));
       return Response.json({ success: true, event: newEvent });
     }
