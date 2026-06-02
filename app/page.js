@@ -294,7 +294,16 @@ export default function HomePage() {
       const dayOfWeek = t.dayNames[currentDate.getDay()];
       const formattedDate = currentDate.toISOString().slice(0,10);
       const dayEvents = musicEvents.filter(ev => ev.date === formattedDate);
-      const musicSuggestion = dayEvents.length > 0 ? dayEvents[0].name : (musicEvents.length > 0 ? musicEvents[i % musicEvents.length].name : 'Serata libera');
+      
+      let musicSuggestion;
+      if (dayEvents.length > 0) {
+        musicSuggestion = `${dayEvents[0].name} @ ${dayEvents[0].venue}`;
+      } else if (musicEvents.length > 0) {
+        const fallbackEvent = musicEvents[i % musicEvents.length];
+        musicSuggestion = `${fallbackEvent.name} @ ${fallbackEvent.venue}`;
+      } else {
+        musicSuggestion = 'Serata libera';
+      }
       
       const availableRestaurants = restaurantsList.filter(filterByBudget);
       let lunchRestaurant, dinnerRestaurant;
@@ -533,14 +542,11 @@ export default function HomePage() {
                 <label style={{ fontWeight: 'bold', color: darkMode ? '#E6EDF5' : lightText, fontSize: isMobile ? '0.9rem' : '1rem' }}>{t.arrival}</label>
                 <small style={{ display: 'block', color: darkMode ? '#E6EDF5' : lightTextMuted, fontSize: isMobile ? '0.8rem' : '0.9rem' }}>{t.arrivalDesc}</small>
                 <input 
-                  type="date" 
+                  type="text" 
+                  placeholder="YYYY-MM-DD (es. 2026-06-02)"
                   value={formData.arrivalDate} 
                   onChange={e=>setFormData({...formData,arrivalDate:e.target.value})} 
-                  style={{
-                    ...inputStyle(darkMode, errors.arrivalDate, darkMode ? accentBlue : lightPrimary, isMobile),
-                    minWidth: '0',
-                    width: '100%'
-                  }} 
+                  style={inputStyle(darkMode, errors.arrivalDate, darkMode ? accentBlue : lightPrimary, isMobile)}
                 />
               </div>
               <div>
