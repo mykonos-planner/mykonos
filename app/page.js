@@ -266,7 +266,6 @@ export default function HomePage() {
     if (isNaN(days)) days = 7;
     const startDate = new Date(formData.arrivalDate);
     const budgetLevel = formData.budget;
-    const groupNum = parseInt(formData.groupSize) || 1;
 
     const endDate = new Date(startDate);
     endDate.setDate(startDate.getDate() + days - 1);
@@ -275,17 +274,33 @@ export default function HomePage() {
       return evDate >= startDate && evDate <= endDate;
     });
 
-    const musicEvents = eventsInRange.filter(ev => ev.category === 'Night Club' || ev.type === 'event');
+    // Definizione delle liste in base al budget
+    let musicEvents = eventsInRange.filter(ev => ev.category === 'Night Club' || ev.type === 'event');
     let restaurantsList = events.filter(ev => ev.type === 'restaurant');
     let beachesList = events.filter(ev => ev.type === 'beach');
     let extrasList = events.filter(ev => ev.type === 'extra' && ev.serviceType !== 'scooter' && ev.serviceType !== 'car');
 
+    // Filtro per budget
     const filterByBudget = (item) => {
-      if (!item.budget) return true;
-      if (budgetLevel === 'luxury') return item.budget === 'luxury' || item.budget === 'mid';
-      if (budgetLevel === 'mid') return item.budget !== 'luxury';
-      return item.budget === 'budget' || !item.budget;
+      if (!item.budget) return true; // se non specificato, lo includiamo in tutti? Per sicurezza lo includiamo solo per mid? Meglio assegnare un default 'mid' nei dati.
+      if (budgetLevel === 'budget') {
+        return item.budget === 'budget' || item.budget === 'mid';
+      } else if (budgetLevel === 'mid') {
+        return item.budget === 'mid';
+      } else { // luxury
+        return item.budget === 'luxury';
+      }
     };
+
+    musicEvents = musicEvents.filter(filterByBudget);
+    restaurantsList = restaurantsList.filter(filterByBudget);
+    beachesList = beachesList.filter(filterByBudget);
+    
+    if (budgetLevel === 'budget') {
+      extrasList = [];
+    } else {
+      extrasList = extrasList.filter(filterByBudget);
+    }
 
     let itinerary = '';
     for (let i = 0; i < days; i++) {
@@ -305,7 +320,7 @@ export default function HomePage() {
         musicSuggestion = 'Serata libera';
       }
       
-      const availableRestaurants = restaurantsList.filter(filterByBudget);
+      const availableRestaurants = restaurantsList;
       let lunchRestaurant, dinnerRestaurant;
       if (availableRestaurants.length === 0) {
         lunchRestaurant = dinnerRestaurant = 'Taverna locale';
@@ -321,20 +336,27 @@ export default function HomePage() {
         dinnerRestaurant = shuffled[1].name;
       }
       
-      const availableBeaches = beachesList.filter(filterByBudget);
+      const availableBeaches = beachesList;
       const beachSuggestion = availableBeaches.length > 0 ? availableBeaches[i % availableBeaches.length].name : 'Spiaggia libera';
       
-      const availableExtras = extrasList.filter(filterByBudget);
-      const extraSuggestion = availableExtras.length > 0 ? availableExtras[i % availableExtras.length].name : 'Relax in hotel';
+      let extraLine = '';
+      if (budgetLevel !== 'budget' && extrasList.length > 0) {
+        const extraSuggestion = extrasList[i % extrasList.length].name;
+        extraLine = `\n   ⚡ ${t.extraLabel}: ${extraSuggestion}`;
+      } else if (budgetLevel !== 'budget' && extrasList.length === 0) {
+        extraLine = `\n   ⚡ ${t.extraLabel}: Relax in hotel`;
+      }
       
       itinerary += `\n📅 ${dayOfWeek} ${formattedDate}\n`;
       itinerary += `   ☀️ ${t.morningLabel}: ${beachSuggestion}\n`;
       itinerary += `   🍽️ ${t.lunchLabel}: ${lunchRestaurant}\n`;
       itinerary += `   🍽️ ${t.dinnerLabel}: ${dinnerRestaurant}\n`;
-      itinerary += `   🎧 ${t.eveningLabel}: ${musicSuggestion}\n`;
-      itinerary += `   ⚡ ${t.extraLabel}: ${extraSuggestion}\n`;
+      itinerary += `   🎧 ${t.eveningLabel}: ${musicSuggestion}`;
+      itinerary += extraLine;
+      itinerary += `\n`;
     }
     
+    const groupNum = parseInt(formData.groupSize) || 1;
     const msg = `🏝️ MYKONOS PLANNING 🏝️\n━━━━━━━━━━━━━━━━━━\n👤 ${t.name}: ${formData.name}\n👥 ${t.group}: ${groupNum}\n📅 ${t.arrival}: ${formData.arrivalDate}\n⏱️ ${t.days}: ${days}\n💰 ${t.budgetLabel}: ${formData.budget === 'luxury' ? 'Luxury' : formData.budget === 'mid' ? 'Mid Range' : 'Budget'}\n${itinerary}`;
     setGeneratedMsg(msg);
   };
