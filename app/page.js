@@ -320,7 +320,6 @@ export default function HomePage() {
 
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '20px' }}>
-      {/* Barra lingua + tema */}
       <div style={{ display: 'flex', justifyContent: isMobile ? 'space-between' : 'flex-end', alignItems: 'center', gap: '12px', marginBottom: '24px', flexWrap: 'wrap', width: '100%' }}>
         <div style={{ display: 'flex', gap: '8px', flex: isMobile ? 1 : 'none', justifyContent: isMobile ? 'space-evenly' : 'flex-end', flexWrap: 'wrap', width: isMobile ? '100%' : 'auto' }}>
           {['it','en','fr','es'].map(l => (
@@ -362,7 +361,7 @@ export default function HomePage() {
               <h2 style={{ margin: 0, color: darkMode ? '#E6EDF5' : lightText }}>📆 {lang === 'it' ? 'Calendario eventi' : lang === 'en' ? 'Event Calendar' : lang === 'fr' ? 'Calendrier des événements' : 'Calendario de eventos'}</h2>
               <div style={{ display: 'flex', gap: '8px' }}>
                 <button onClick={prevMonth} style={{ background: darkMode ? '#0B131F' : lightBgAlt, border: `1px solid ${lightPrimary}`, borderRadius: '40px', padding: '6px 12px', cursor: 'pointer' }}>{t.prevMonth}</button>
-                <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: darkMode ? '#E6EDF5' : lightText }}>{getMonthName()} {currentYear}</span>
+                <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: darkMode ? '#E6EDF5' : lightText }}>{monthNames[lang][currentMonth]} {currentYear}</span>
                 <button onClick={nextMonth} style={{ background: darkMode ? '#0B131F' : lightBgAlt, border: `1px solid ${lightPrimary}`, borderRadius: '40px', padding: '6px 12px', cursor: 'pointer' }}>{t.nextMonth}</button>
               </div>
             </div>
@@ -381,12 +380,12 @@ export default function HomePage() {
             {daysArray.map(day => {
               const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
               const dayEvents = eventsByDay[dateStr] || [];
-              if (dayEvents.length === 0) return null; // salta giorni senza eventi
+              if (dayEvents.length === 0) return null;
               const dateObj = new Date(currentYear, currentMonth, day);
               const dayName = t.dayNames[dateObj.getDay()];
               return (
                 <div key={day} style={{ marginBottom: '24px', borderBottom: `1px solid ${darkMode ? '#334155' : '#e2e8f0'}`, paddingBottom: '16px' }}>
-                  <h3 style={{ fontSize: '1.2rem', color: darkMode ? '#E6EDF5' : lightText, marginBottom: '12px' }}>{dayName} {day} {getMonthName()}</h3>
+                  <h3 style={{ fontSize: '1.2rem', color: darkMode ? '#E6EDF5' : lightText, marginBottom: '12px' }}>{dayName} {day} {monthNames[lang][currentMonth]}</h3>
                   {dayEvents.map(ev => (
                     <div key={ev.id} style={{ background: darkMode ? '#0B131F' : lightBgAlt, borderRadius: '16px', padding: '12px', marginBottom: '10px', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center' }}>
                       <div><strong>{ev.name}</strong> @ {ev.venue}</div>
@@ -406,36 +405,11 @@ export default function HomePage() {
           <div style={{ background: darkMode ? '#162235' : lightBgCard, borderRadius: '28px', padding: '24px', boxShadow: '0 8px 20px rgba(0,0,0,0.08)' }}>
             <h2 style={{ color: darkMode ? '#E6EDF5' : lightText }}>✍️ {lang === 'it' ? 'Crea il tuo programma' : lang === 'en' ? 'Create your program' : lang === 'fr' ? 'Créez votre programme' : 'Crea tu programa'}</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginTop: '20px' }}>
-              <div>
-                <label style={{ fontWeight: 'bold', color: darkMode ? '#E6EDF5' : lightText }}>{t.name}</label>
-                <small style={{ display: 'block', color: darkMode ? '#E6EDF5' : lightTextMuted }}>{t.nameDesc}</small>
-                <input type="text" value={formData.name} onChange={e=>setFormData({...formData,name:e.target.value})} style={inputStyle(darkMode, errors.name, lightPrimary)} />
-              </div>
-              <div>
-                <label style={{ fontWeight: 'bold', color: darkMode ? '#E6EDF5' : lightText }}>{t.group}</label>
-                <small style={{ display: 'block', color: darkMode ? '#E6EDF5' : lightTextMuted }}>{t.groupDesc}</small>
-                <input type="number" min="1" value={formData.groupSize} onChange={e=>setFormData({...formData,groupSize:parseInt(e.target.value)||1})} style={inputStyle(darkMode, errors.groupSize, lightPrimary)} />
-              </div>
-              <div>
-                <label style={{ fontWeight: 'bold', color: darkMode ? '#E6EDF5' : lightText }}>{t.arrival}</label>
-                <small style={{ display: 'block', color: darkMode ? '#E6EDF5' : lightTextMuted }}>{t.arrivalDesc}</small>
-                <input type="date" value={formData.arrivalDate} onChange={e=>setFormData({...formData,arrivalDate:e.target.value})} style={inputStyle(darkMode, errors.arrivalDate, lightPrimary)} />
-              </div>
-              <div>
-                <label style={{ fontWeight: 'bold', color: darkMode ? '#E6EDF5' : lightText }}>{t.days}</label>
-                <small style={{ display: 'block', color: darkMode ? '#E6EDF5' : lightTextMuted }}>{t.daysDesc}</small>
-                <select value={formData.stayDays} onChange={e=>setFormData({...formData,stayDays:e.target.value})} style={selectStyle(darkMode, errors.stayDays, lightPrimary)}>
-                  <option value="3">3</option><option value="5">5</option><option value="7">7</option><option value="10">10</option><option value="14">14</option><option value="custom">Custom</option>
-                </select>
-                {formData.stayDays === 'custom' && <input type="number" placeholder="#" value={formData.customDays} onChange={e=>setFormData({...formData,customDays:e.target.value})} style={{ ...inputStyle(darkMode, false, lightPrimary), marginTop: '10px' }} />}
-              </div>
-              <div>
-                <label style={{ fontWeight: 'bold', color: darkMode ? '#E6EDF5' : lightText }}>{t.budgetLabel}</label>
-                <small style={{ display: 'block', color: darkMode ? '#E6EDF5' : lightTextMuted }}>{t.budgetDesc}</small>
-                <select value={formData.budget} onChange={e=>setFormData({...formData,budget:e.target.value})} style={selectStyle(darkMode, false, lightPrimary)}>
-                  <option value="luxury">💰 Luxury</option><option value="mid">💵 Mid Range</option><option value="budget">🟢 Budget</option>
-                </select>
-              </div>
+              <div><label style={{ fontWeight: 'bold', color: darkMode ? '#E6EDF5' : lightText }}>{t.name}</label><small style={{ display: 'block', color: darkMode ? '#E6EDF5' : lightTextMuted }}>{t.nameDesc}</small><input type="text" value={formData.name} onChange={e=>setFormData({...formData,name:e.target.value})} style={inputStyle(darkMode, errors.name, lightPrimary)} /></div>
+              <div><label style={{ fontWeight: 'bold', color: darkMode ? '#E6EDF5' : lightText }}>{t.group}</label><small style={{ display: 'block', color: darkMode ? '#E6EDF5' : lightTextMuted }}>{t.groupDesc}</small><input type="number" min="1" value={formData.groupSize} onChange={e=>setFormData({...formData,groupSize:parseInt(e.target.value)||1})} style={inputStyle(darkMode, errors.groupSize, lightPrimary)} /></div>
+              <div><label style={{ fontWeight: 'bold', color: darkMode ? '#E6EDF5' : lightText }}>{t.arrival}</label><small style={{ display: 'block', color: darkMode ? '#E6EDF5' : lightTextMuted }}>{t.arrivalDesc}</small><input type="date" value={formData.arrivalDate} onChange={e=>setFormData({...formData,arrivalDate:e.target.value})} style={inputStyle(darkMode, errors.arrivalDate, lightPrimary)} /></div>
+              <div><label style={{ fontWeight: 'bold', color: darkMode ? '#E6EDF5' : lightText }}>{t.days}</label><small style={{ display: 'block', color: darkMode ? '#E6EDF5' : lightTextMuted }}>{t.daysDesc}</small><select value={formData.stayDays} onChange={e=>setFormData({...formData,stayDays:e.target.value})} style={selectStyle(darkMode, errors.stayDays, lightPrimary)}><option value="3">3</option><option value="5">5</option><option value="7">7</option><option value="10">10</option><option value="14">14</option><option value="custom">Custom</option></select>{formData.stayDays === 'custom' && <input type="number" placeholder="#" value={formData.customDays} onChange={e=>setFormData({...formData,customDays:e.target.value})} style={{ ...inputStyle(darkMode, false, lightPrimary), marginTop: '10px' }} />}</div>
+              <div><label style={{ fontWeight: 'bold', color: darkMode ? '#E6EDF5' : lightText }}>{t.budgetLabel}</label><small style={{ display: 'block', color: darkMode ? '#E6EDF5' : lightTextMuted }}>{t.budgetDesc}</small><select value={formData.budget} onChange={e=>setFormData({...formData,budget:e.target.value})} style={selectStyle(darkMode, false, lightPrimary)}><option value="luxury">💰 Luxury</option><option value="mid">💵 Mid Range</option><option value="budget">🟢 Budget</option></select></div>
               <button onClick={generateItinerary} style={{ background: darkMode ? '#38A1F3' : lightPrimary, color: 'white', border: 'none', padding: '14px', borderRadius: '48px', fontWeight: 'bold', cursor: 'pointer' }}>{t.generate}</button>
               {generatedMsg && (
                 <div style={{ marginTop: '20px', background: darkMode ? '#0B131F' : lightBgAlt, padding: '20px', borderRadius: '24px', whiteSpace: 'pre-wrap', fontFamily: 'monospace', color: darkMode ? '#E6EDF5' : lightText }}>
@@ -451,22 +425,10 @@ export default function HomePage() {
           <div style={{ background: darkMode ? '#162235' : lightBgCard, borderRadius: '28px', padding: '24px', boxShadow: '0 8px 20px rgba(0,0,0,0.08)' }}>
             <h2 style={{ color: darkMode ? '#E6EDF5' : lightText }}>🏛️ {lang === 'it' ? 'Scopri Mykonos' : lang === 'en' ? 'Discover Mykonos' : lang === 'fr' ? 'Découvrez Mykonos' : 'Descubre Mykonos'}</h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px,1fr))', gap: '24px', marginTop: '24px' }}>
-              <div style={{ background: darkMode ? '#0B131F' : lightBgAlt, borderRadius: '20px', padding: '16px' }}>
-                <h3 style={{ color: darkMode ? '#38A1F3' : lightPrimary, marginBottom: '12px' }}>🏖️ {t.beachClubs}</h3>
-                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>{servicesData.beachClubs.map(c => <li key={c} style={{ marginBottom: '8px', color: darkMode ? '#E6EDF5' : lightText }}>🌊 {c}</li>)}</ul>
-              </div>
-              <div style={{ background: darkMode ? '#0B131F' : lightBgAlt, borderRadius: '20px', padding: '16px' }}>
-                <h3 style={{ color: darkMode ? '#38A1F3' : lightPrimary, marginBottom: '12px' }}>🎧 {t.nightClubs}</h3>
-                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>{servicesData.nightClubs.map(c => <li key={c} style={{ marginBottom: '8px', color: darkMode ? '#E6EDF5' : lightText }}>🎵 {c}</li>)}</ul>
-              </div>
-              <div style={{ background: darkMode ? '#0B131F' : lightBgAlt, borderRadius: '20px', padding: '16px' }}>
-                <h3 style={{ color: darkMode ? '#38A1F3' : lightPrimary, marginBottom: '12px' }}>🍽️ {t.restaurants}</h3>
-                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>{servicesData.restaurants.map(c => <li key={c} style={{ marginBottom: '8px', color: darkMode ? '#E6EDF5' : lightText }}>🍴 {c}</li>)}</ul>
-              </div>
-              <div style={{ background: darkMode ? '#0B131F' : lightBgAlt, borderRadius: '20px', padding: '16px' }}>
-                <h3 style={{ color: darkMode ? '#38A1F3' : lightPrimary, marginBottom: '12px' }}>⚡ {t.extras}</h3>
-                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>{servicesData.extras.map(c => <li key={c} style={{ marginBottom: '8px', color: darkMode ? '#E6EDF5' : lightText }}>🚤 {c}</li>)}</ul>
-              </div>
+              <div style={{ background: darkMode ? '#0B131F' : lightBgAlt, borderRadius: '20px', padding: '16px' }}><h3 style={{ color: darkMode ? '#38A1F3' : lightPrimary, marginBottom: '12px' }}>🏖️ {t.beachClubs}</h3><ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>{servicesData.beachClubs.map(c => <li key={c} style={{ marginBottom: '8px', color: darkMode ? '#E6EDF5' : lightText }}>🌊 {c}</li>)}</ul></div>
+              <div style={{ background: darkMode ? '#0B131F' : lightBgAlt, borderRadius: '20px', padding: '16px' }}><h3 style={{ color: darkMode ? '#38A1F3' : lightPrimary, marginBottom: '12px' }}>🎧 {t.nightClubs}</h3><ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>{servicesData.nightClubs.map(c => <li key={c} style={{ marginBottom: '8px', color: darkMode ? '#E6EDF5' : lightText }}>🎵 {c}</li>)}</ul></div>
+              <div style={{ background: darkMode ? '#0B131F' : lightBgAlt, borderRadius: '20px', padding: '16px' }}><h3 style={{ color: darkMode ? '#38A1F3' : lightPrimary, marginBottom: '12px' }}>🍽️ {t.restaurants}</h3><ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>{servicesData.restaurants.map(c => <li key={c} style={{ marginBottom: '8px', color: darkMode ? '#E6EDF5' : lightText }}>🍴 {c}</li>)}</ul></div>
+              <div style={{ background: darkMode ? '#0B131F' : lightBgAlt, borderRadius: '20px', padding: '16px' }}><h3 style={{ color: darkMode ? '#38A1F3' : lightPrimary, marginBottom: '12px' }}>⚡ {t.extras}</h3><ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>{servicesData.extras.map(c => <li key={c} style={{ marginBottom: '8px', color: darkMode ? '#E6EDF5' : lightText }}>🚤 {c}</li>)}</ul></div>
             </div>
             <p style={{ marginTop: '24px', color: darkMode ? '#E6EDF5' : lightTextMuted, fontSize: '0.9rem', textAlign: 'center' }}>💡 Per prenotazioni e disponibilità, contattami su WhatsApp!</p>
           </div>
