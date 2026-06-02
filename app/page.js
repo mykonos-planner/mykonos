@@ -403,15 +403,17 @@ export default function HomePage() {
             maxWidth: '900px',
             margin: '0 auto'
           }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
-              <h2 style={{ margin: 0, color: darkMode ? '#E6EDF5' : lightText, fontSize: isMobile ? '1.3rem' : '1.5rem' }}>📆 {lang === 'it' ? 'Calendario eventi' : lang === 'en' ? 'Event Calendar' : lang === 'fr' ? 'Calendrier des événements' : 'Calendario de eventos'}</h2>
-              <div style={{ display: 'flex', gap: '8px' }}>
+            {/* Intestazione centrata */}
+            <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'center', alignItems: 'center', marginBottom: '24px', gap: '16px' }}>
+              <h2 style={{ margin: 0, color: darkMode ? '#E6EDF5' : lightText, fontSize: isMobile ? '1.3rem' : '1.5rem', textAlign: 'center' }}>📆 {lang === 'it' ? 'Calendario eventi' : lang === 'en' ? 'Event Calendar' : lang === 'fr' ? 'Calendrier des événements' : 'Calendario de eventos'}</h2>
+              <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
                 <button onClick={prevMonth} style={{ background: darkMode ? '#0B131F' : lightBgAlt, border: `1px solid ${lightPrimary}`, borderRadius: '40px', padding: '6px 12px', cursor: 'pointer', color: darkMode ? '#E6EDF5' : lightText, fontSize: isMobile ? '0.9rem' : '1rem' }}>{t.prevMonth}</button>
                 <span style={{ fontSize: isMobile ? '1rem' : '1.2rem', fontWeight: 'bold', color: darkMode ? '#E6EDF5' : lightText }}>{monthNames[lang][currentMonth]} {currentYear}</span>
                 <button onClick={nextMonth} style={{ background: darkMode ? '#0B131F' : lightBgAlt, border: `1px solid ${lightPrimary}`, borderRadius: '40px', padding: '6px 12px', cursor: 'pointer', color: darkMode ? '#E6EDF5' : lightText, fontSize: isMobile ? '0.9rem' : '1rem' }}>{t.nextMonth}</button>
               </div>
             </div>
-            <div style={{ display: 'flex', gap: '16px', marginBottom: '24px', flexWrap: 'wrap' }}>
+            {/* Filtri centrati */}
+            <div style={{ display: 'flex', gap: '16px', marginBottom: '24px', flexWrap: 'wrap', justifyContent: 'center' }}>
               <select value={filterCategory} onChange={e => setFilterCategory(e.target.value)} style={{ padding: '8px 16px', borderRadius: '40px', background: darkMode ? '#0B131F' : lightBgAlt, border: `1px solid ${darkMode ? accentBlue : lightPrimary}`, color: darkMode ? '#E6EDF5' : lightText, fontSize: isMobile ? '0.85rem' : '0.9rem' }}>
                 <option value="all">{t.all} categorie</option>
                 <option value="Night Club">{t.categories['Night Club']}</option>
@@ -532,11 +534,17 @@ export default function HomePage() {
               <div>
                 <label style={{ fontWeight: 'bold', color: darkMode ? '#E6EDF5' : lightText, fontSize: isMobile ? '0.9rem' : '1rem' }}>{t.arrival}</label>
                 <small style={{ display: 'block', color: darkMode ? '#E6EDF5' : lightTextMuted, fontSize: isMobile ? '0.8rem' : '0.9rem' }}>{t.arrivalDesc}</small>
-                <input type="date" value={formData.arrivalDate} onChange={e=>setFormData({...formData,arrivalDate:e.target.value})} style={{
-                  ...inputStyle(darkMode, errors.arrivalDate, darkMode ? accentBlue : lightPrimary, isMobile),
-                  boxSizing: 'border-box',
-                  maxWidth: '100%'
-                }} />
+                <input 
+                  type="date" 
+                  value={formData.arrivalDate} 
+                  onChange={e=>setFormData({...formData,arrivalDate:e.target.value})} 
+                  style={{
+                    ...inputStyle(darkMode, errors.arrivalDate, darkMode ? accentBlue : lightPrimary, isMobile),
+                    boxSizing: 'border-box',
+                    maxWidth: '100%',
+                    display: 'block'
+                  }} 
+                />
               </div>
               <div>
                 <label style={{ fontWeight: 'bold', color: darkMode ? '#E6EDF5' : lightText, fontSize: isMobile ? '0.9rem' : '1rem' }}>{t.days}</label>
@@ -595,13 +603,15 @@ export default function HomePage() {
 
 const inputStyle = (darkMode, hasError, primaryColor, isMobile) => ({
   width: '100%',
+  maxWidth: '100%',
   padding: isMobile ? '10px 12px' : '12px',
   borderRadius: '48px',
   border: hasError ? '2px solid #E03B7B' : `1px solid ${primaryColor}`,
   background: darkMode ? '#0B131F' : '#FFFFFF',
   color: darkMode ? '#E6EDF5' : '#3E4A5B',
   fontSize: isMobile ? '0.9rem' : '1rem',
-  boxSizing: 'border-box'
+  boxSizing: 'border-box',
+  display: 'block'
 });
 
 const selectStyle = (darkMode, hasError, primaryColor, isMobile) => ({
