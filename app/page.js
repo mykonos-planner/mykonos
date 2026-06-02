@@ -299,7 +299,6 @@ export default function HomePage() {
       extrasList = [];
     } else {
       extrasList = extrasList.filter(filterByBudget);
-      // Filtra extra per numero di persone
       extrasList = extrasList.filter(extra => {
         const min = extra.minPersons;
         const max = extra.maxPersons;
@@ -314,8 +313,14 @@ export default function HomePage() {
       const currentDate = new Date(startDate);
       currentDate.setDate(startDate.getDate() + i);
       const dayOfWeek = t.dayNames[currentDate.getDay()];
-      const formattedDate = currentDate.toISOString().slice(0,10);
-      const dayEvents = musicEvents.filter(ev => ev.date === formattedDate);
+      // Data formattata in base alla lingua
+      const localizedDate = currentDate.toLocaleDateString(lang, {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      });
+      const formattedDateISO = currentDate.toISOString().slice(0,10); // per filtri
+      const dayEvents = musicEvents.filter(ev => ev.date === formattedDateISO);
       
       let musicSuggestion;
       if (dayEvents.length > 0) {
@@ -359,7 +364,7 @@ export default function HomePage() {
         extraLine = `\n   ⚡ ${t.extraLabel}: Relax in hotel`;
       }
       
-      itinerary += `\n📅 ${dayOfWeek} ${formattedDate}\n`;
+      itinerary += `\n📅 ${dayOfWeek} ${localizedDate}\n`;
       itinerary += `   ☀️ ${t.morningLabel}: ${beachSuggestion}\n`;
       itinerary += `   🍽️ ${t.lunchLabel}: ${lunchRestaurant}\n`;
       itinerary += `   🍽️ ${t.dinnerLabel}: ${dinnerRestaurant}\n`;
