@@ -394,69 +394,84 @@ export default function HomePage() {
       </div>
 
       <div style={transitionStyle}>
-        {activeTab === 'explore' && (
+                {activeTab === 'explore' && (
           <div style={{ background: darkMode ? '#162235' : lightBgCard, borderRadius: '28px', padding: '24px', boxShadow: '0 8px 20px rgba(0,0,0,0.08)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
-              <h2 style={{ margin: 0, color: darkMode ? '#E6EDF5' : lightText }}>📆 {lang === 'it' ? 'Calendario eventi' : lang === 'en' ? 'Event Calendar' : lang === 'fr' ? 'Calendrier des événements' : 'Calendario de eventos'}</h2>
+              <h2 style={{ margin: 0, color: darkMode ? '#E6EDF5' : lightText, fontSize: isMobile ? '1.3rem' : '1.5rem' }}>📆 {lang === 'it' ? 'Calendario eventi' : lang === 'en' ? 'Event Calendar' : lang === 'fr' ? 'Calendrier des événements' : 'Calendario de eventos'}</h2>
               <div style={{ display: 'flex', gap: '8px' }}>
-                <button onClick={prevMonth} style={{ background: darkMode ? '#0B131F' : lightBgAlt, border: `1px solid ${lightPrimary}`, borderRadius: '40px', padding: '6px 12px', cursor: 'pointer', color: darkMode ? '#E6EDF5' : lightText }}>{t.prevMonth}</button>
-                <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: darkMode ? '#E6EDF5' : lightText }}>{monthNames[lang][currentMonth]} {currentYear}</span>
-                <button onClick={nextMonth} style={{ background: darkMode ? '#0B131F' : lightBgAlt, border: `1px solid ${lightPrimary}`, borderRadius: '40px', padding: '6px 12px', cursor: 'pointer', color: darkMode ? '#E6EDF5' : lightText }}>{t.nextMonth}</button>
+                <button onClick={prevMonth} style={{ background: darkMode ? '#0B131F' : lightBgAlt, border: `1px solid ${lightPrimary}`, borderRadius: '40px', padding: '6px 12px', cursor: 'pointer', color: darkMode ? '#E6EDF5' : lightText, fontSize: isMobile ? '0.9rem' : '1rem' }}>{t.prevMonth}</button>
+                <span style={{ fontSize: isMobile ? '1rem' : '1.2rem', fontWeight: 'bold', color: darkMode ? '#E6EDF5' : lightText }}>{monthNames[lang][currentMonth]} {currentYear}</span>
+                <button onClick={nextMonth} style={{ background: darkMode ? '#0B131F' : lightBgAlt, border: `1px solid ${lightPrimary}`, borderRadius: '40px', padding: '6px 12px', cursor: 'pointer', color: darkMode ? '#E6EDF5' : lightText, fontSize: isMobile ? '0.9rem' : '1rem' }}>{t.nextMonth}</button>
               </div>
             </div>
             <div style={{ display: 'flex', gap: '16px', marginBottom: '24px', flexWrap: 'wrap' }}>
-              <select value={filterCategory} onChange={e => setFilterCategory(e.target.value)} style={{ padding: '8px 16px', borderRadius: '40px', background: darkMode ? '#0B131F' : lightBgAlt, border: `1px solid ${darkMode ? accentBlue : lightPrimary}`, color: darkMode ? '#E6EDF5' : lightText }}>
+              <select value={filterCategory} onChange={e => setFilterCategory(e.target.value)} style={{ padding: '8px 16px', borderRadius: '40px', background: darkMode ? '#0B131F' : lightBgAlt, border: `1px solid ${darkMode ? accentBlue : lightPrimary}`, color: darkMode ? '#E6EDF5' : lightText, fontSize: isMobile ? '0.85rem' : '0.9rem' }}>
                 <option value="all">{t.all} categorie</option>
                 <option value="Night Club">{t.categories['Night Club']}</option>
                 <option value="Beach Club">{t.categories['Beach Club']}</option>
                 <option value="Restaurant">{t.categories['Restaurant']}</option>
               </select>
-              <select value={filterVenue} onChange={e => setFilterVenue(e.target.value)} style={{ padding: '8px 16px', borderRadius: '40px', background: darkMode ? '#0B131F' : lightBgAlt, border: `1px solid ${darkMode ? accentBlue : lightPrimary}`, color: darkMode ? '#E6EDF5' : lightText }}>
+              <select value={filterVenue} onChange={e => setFilterVenue(e.target.value)} style={{ padding: '8px 16px', borderRadius: '40px', background: darkMode ? '#0B131F' : lightBgAlt, border: `1px solid ${darkMode ? accentBlue : lightPrimary}`, color: darkMode ? '#E6EDF5' : lightText, fontSize: isMobile ? '0.85rem' : '0.9rem' }}>
                 <option value="all">{t.all} locali</option>
                 {uniqueVenues.map(v => <option key={v} value={v}>{v}</option>)}
               </select>
             </div>
-            {(() => {
-              const hasEvents = daysArray.some(day => {
-                const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                return eventsByDay[dateStr] && eventsByDay[dateStr].length > 0;
-              });
-              if (!hasEvents) {
-                return <p style={{ textAlign: 'center', color: darkMode ? '#E6EDF5' : lightTextMuted }}>Nessun evento in questo mese con i filtri selezionati.</p>;
-              }
-              return daysArray.map(day => {
-                const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                const dayEvents = eventsByDay[dateStr] || [];
-                if (dayEvents.length === 0) return null;
-                const dateObj = new Date(currentYear, currentMonth, day);
-                const dayName = t.dayNames[dateObj.getDay()];
-                return (
-                  <div key={day} style={{ marginBottom: '24px', borderBottom: `1px solid ${darkMode ? '#334155' : '#e2e8f0'}`, paddingBottom: '16px' }}>
-                    <h3 style={{ fontSize: '1.2rem', color: darkMode ? '#E6EDF5' : lightText, marginBottom: '12px' }}>{dayName} {day} {monthNames[lang][currentMonth]}</h3>
-                    {dayEvents.map(ev => {
-                      const venueColor = venueColors[ev.venue] || defaultColor;
-                      return (
-                        <div key={ev.id} style={{
-                          background: darkMode ? '#0B131F' : lightBgAlt,
-                          borderRadius: '16px',
-                          padding: '12px',
-                          marginBottom: '10px',
-                          display: 'flex',
-                          flexWrap: 'wrap',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          borderLeft: `4px solid ${venueColor}`,
-                          boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
-                        }}>
-                          <div><strong style={{ color: venueColor }}>{ev.name}</strong> @ {ev.venue}</div>
-                          <div style={{ background: darkMode ? `${accentOrange}20` : `${lightSecondary}20`, padding: '4px 12px', borderRadius: '20px', fontSize: '0.75rem', color: darkMode ? accentOrange : lightSecondary }}>{t.categories[ev.category] || ev.category}</div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                );
-              });
-            })()}
+            <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+              {(() => {
+                const hasEvents = daysArray.some(day => {
+                  const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                  return eventsByDay[dateStr] && eventsByDay[dateStr].length > 0;
+                });
+                if (!hasEvents) {
+                  return <p style={{ textAlign: 'center', color: darkMode ? '#E6EDF5' : lightTextMuted, fontSize: isMobile ? '0.9rem' : '1rem' }}>Nessun evento in questo mese con i filtri selezionati.</p>;
+                }
+                return daysArray.map(day => {
+                  const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                  const dayEvents = eventsByDay[dateStr] || [];
+                  if (dayEvents.length === 0) return null;
+                  const dateObj = new Date(currentYear, currentMonth, day);
+                  const dayName = t.dayNames[dateObj.getDay()];
+                  return (
+                    <div key={day} style={{ marginBottom: '24px', borderBottom: `1px solid ${darkMode ? '#334155' : '#e2e8f0'}`, paddingBottom: '16px' }}>
+                      <h3 style={{ fontSize: isMobile ? '1rem' : '1.2rem', color: darkMode ? '#E6EDF5' : lightText, marginBottom: '12px' }}>{dayName} {day} {monthNames[lang][currentMonth]}</h3>
+                      {dayEvents.map(ev => {
+                        const venueColor = venueColors[ev.venue] || defaultColor;
+                        return (
+                          <div key={ev.id} style={{
+                            background: darkMode ? '#0B131F' : lightBgAlt,
+                            borderRadius: '16px',
+                            padding: isMobile ? '12px 10px' : '12px 16px',
+                            marginBottom: '10px',
+                            display: 'flex',
+                            flexDirection: isMobile ? 'column' : 'row',
+                            justifyContent: 'space-between',
+                            alignItems: isMobile ? 'flex-start' : 'center',
+                            borderLeft: `4px solid ${venueColor}`,
+                            boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+                            gap: isMobile ? '8px' : '0'
+                          }}>
+                            <div style={{ fontSize: isMobile ? '0.9rem' : '1rem', wordBreak: 'break-word', flex: 1 }}>
+                              <strong style={{ color: venueColor, fontSize: isMobile ? '0.95rem' : '1rem' }}>{ev.name}</strong> @ {ev.venue}
+                            </div>
+                            <div style={{
+                              background: darkMode ? `${accentOrange}20` : `${lightSecondary}20`,
+                              padding: '4px 12px',
+                              borderRadius: '20px',
+                              fontSize: isMobile ? '0.7rem' : '0.75rem',
+                              color: darkMode ? accentOrange : lightSecondary,
+                              whiteSpace: 'nowrap',
+                              alignSelf: isMobile ? 'flex-start' : 'center'
+                            }}>
+                              {t.categories[ev.category] || ev.category}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                });
+              })()}
+            </div>
           </div>
         )}
 
