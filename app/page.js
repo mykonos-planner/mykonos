@@ -16,6 +16,8 @@ export default function HomePage() {
   const [filterVenue, setFilterVenue] = useState('all');
   const [isMobile, setIsMobile] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
+  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 
   useEffect(() => {
     fetch('/api/events')
@@ -31,14 +33,8 @@ export default function HomePage() {
   }, []);
 
   const updateBodyTheme = (isDark) => {
-    if (isDark) {
-      document.body.style.backgroundColor = '#0B131F';
-      document.body.style.color = '#E6EDF5';
-    } else {
-      // Nuova palette light mode ispirata all'immagine
-      document.body.style.backgroundColor = '#FDFBF7';
-      document.body.style.color = '#2C3E50';
-    }
+    document.body.style.backgroundColor = isDark ? '#0B131F' : '#FDFBF7';
+    document.body.style.color = isDark ? '#E6EDF5' : '#2C3E50';
   };
 
   const toggleDark = () => {
@@ -57,7 +53,23 @@ export default function HomePage() {
     }, 200);
   };
 
-  // Traduzioni (identiche a prima)
+  const prevMonth = () => {
+    if (currentMonth === 0) {
+      setCurrentMonth(11);
+      setCurrentYear(currentYear - 1);
+    } else {
+      setCurrentMonth(currentMonth - 1);
+    }
+  };
+  const nextMonth = () => {
+    if (currentMonth === 11) {
+      setCurrentMonth(0);
+      setCurrentYear(currentYear + 1);
+    } else {
+      setCurrentMonth(currentMonth + 1);
+    }
+  };
+
   const translations = {
     it: {
       explore: '📅 Eventi',
@@ -76,7 +88,7 @@ export default function HomePage() {
       generate: 'Genera itinerario',
       copy: 'Copia',
       subtitle: 'Il tuo assistente personale per una vacanza da sogno',
-      categories: { 'Night Club': 'Night Club', 'Beach Club': 'Beach Club', 'Restaurant': 'Ristorante', 'Boat Party': 'Boat Party', 'Service': 'Servizio', 'Beach': 'Spiaggia' },
+      categories: { 'Night Club': 'Night Club', 'Beach Club': 'Beach Club', 'Restaurant': 'Dinner Show', 'Service': 'Servizio', 'Beach': 'Spiaggia' },
       beachClubs: 'Beach Club',
       nightClubs: 'Night Club',
       restaurants: 'Ristoranti',
@@ -88,7 +100,9 @@ export default function HomePage() {
       morningLabel: 'Mattina/Pomeriggio',
       mealLabel: 'Pranzo/Cena',
       eveningLabel: 'Serata',
-      extraLabel: 'Extra'
+      extraLabel: 'Extra',
+      prevMonth: '◀',
+      nextMonth: '▶'
     },
     en: {
       explore: '📅 Events',
@@ -107,7 +121,7 @@ export default function HomePage() {
       generate: 'Generate itinerary',
       copy: 'Copy',
       subtitle: 'Your personal assistant for a dream vacation',
-      categories: { 'Night Club': 'Night Club', 'Beach Club': 'Beach Club', 'Restaurant': 'Restaurant', 'Boat Party': 'Boat Party', 'Service': 'Service', 'Beach': 'Beach' },
+      categories: { 'Night Club': 'Night Club', 'Beach Club': 'Beach Club', 'Restaurant': 'Dinner Show', 'Service': 'Service', 'Beach': 'Beach' },
       beachClubs: 'Beach Clubs',
       nightClubs: 'Night Clubs',
       restaurants: 'Restaurants',
@@ -119,7 +133,9 @@ export default function HomePage() {
       morningLabel: 'Morning/Afternoon',
       mealLabel: 'Lunch/Dinner',
       eveningLabel: 'Evening',
-      extraLabel: 'Extra'
+      extraLabel: 'Extra',
+      prevMonth: '◀',
+      nextMonth: '▶'
     },
     fr: {
       explore: '📅 Événements',
@@ -138,7 +154,7 @@ export default function HomePage() {
       generate: 'Générer itinéraire',
       copy: 'Copier',
       subtitle: 'Votre assistant personnel pour des vacances de rêve',
-      categories: { 'Night Club': 'Club de nuit', 'Beach Club': 'Club de plage', 'Restaurant': 'Restaurant', 'Boat Party': 'Fête en bateau', 'Service': 'Service', 'Beach': 'Plage' },
+      categories: { 'Night Club': 'Club de nuit', 'Beach Club': 'Club de plage', 'Restaurant': 'Dinner Show', 'Service': 'Service', 'Beach': 'Plage' },
       beachClubs: 'Clubs de plage',
       nightClubs: 'Boîtes de nuit',
       restaurants: 'Restaurants',
@@ -150,7 +166,9 @@ export default function HomePage() {
       morningLabel: 'Matin/Après-midi',
       mealLabel: 'Déjeuner/Dîner',
       eveningLabel: 'Soirée',
-      extraLabel: 'Extra'
+      extraLabel: 'Extra',
+      prevMonth: '◀',
+      nextMonth: '▶'
     },
     es: {
       explore: '📅 Eventos',
@@ -169,7 +187,7 @@ export default function HomePage() {
       generate: 'Generar itinerario',
       copy: 'Copiar',
       subtitle: 'Tu asistente personal para unas vacaciones de ensueño',
-      categories: { 'Night Club': 'Discoteca', 'Beach Club': 'Club de playa', 'Restaurant': 'Restaurante', 'Boat Party': 'Fiesta en barco', 'Service': 'Servicio', 'Beach': 'Playa' },
+      categories: { 'Night Club': 'Discoteca', 'Beach Club': 'Club de playa', 'Restaurant': 'Dinner Show', 'Service': 'Servicio', 'Beach': 'Playa' },
       beachClubs: 'Clubes de playa',
       nightClubs: 'Discotecas',
       restaurants: 'Restaurantes',
@@ -181,25 +199,38 @@ export default function HomePage() {
       morningLabel: 'Mañana/Tarde',
       mealLabel: 'Comida/Cena',
       eveningLabel: 'Noche',
-      extraLabel: 'Extra'
+      extraLabel: 'Extra',
+      prevMonth: '◀',
+      nextMonth: '▶'
     }
   };
   const t = translations[lang] || translations.it;
 
-  const capitalizeMonth = (monthStr) => monthStr.charAt(0).toUpperCase() + monthStr.slice(1);
-
-  const groupEventsByMonth = (eventsList) => {
-    const groups = {};
-    eventsList.forEach(ev => {
-      if (!ev.date) return;
-      const date = new Date(ev.date);
-      let monthYear = date.toLocaleString(lang, { month: 'long', year: 'numeric' });
-      monthYear = capitalizeMonth(monthYear);
-      if (!groups[monthYear]) groups[monthYear] = [];
-      groups[monthYear].push(ev);
-    });
-    return groups;
+  const monthNames = {
+    it: ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'],
+    en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+    fr: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
+    es: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
   };
+
+  const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
+  const daysInMonth = getDaysInMonth(currentYear, currentMonth);
+  const daysArray = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+
+  const validEvents = events.filter(ev => ev.date && ev.date > '2020-01-01');
+  const filteredEvents = validEvents.filter(ev => {
+    if (filterCategory !== 'all' && ev.category !== filterCategory) return false;
+    if (filterVenue !== 'all' && ev.venue !== filterVenue) return false;
+    return true;
+  });
+
+  const eventsByDay = {};
+  daysArray.forEach(day => {
+    const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    eventsByDay[dateStr] = filteredEvents.filter(ev => ev.date === dateStr);
+  });
+
+  const uniqueVenues = [...new Set(validEvents.map(ev => ev.venue).filter(Boolean))];
 
   const validateForm = () => {
     let err = {};
@@ -221,15 +252,14 @@ export default function HomePage() {
 
     const endDate = new Date(startDate);
     endDate.setDate(startDate.getDate() + days - 1);
-    const eventsInRange = events.filter(ev => {
-      if (!ev.date) return false;
+    const eventsInRange = validEvents.filter(ev => {
       const evDate = new Date(ev.date);
       return evDate >= startDate && evDate <= endDate;
     });
 
     const musicEvents = eventsInRange.filter(ev => ev.category === 'Night Club' || ev.type === 'event');
-    const restaurantsList = events.filter(ev => ev.category === 'Restaurant' || ev.type === 'restaurant');
-    const beachesList = events.filter(ev => ev.category === 'Beach' || ev.type === 'beach');
+    const restaurantsList = events.filter(ev => ev.type === 'restaurant');
+    const beachesList = events.filter(ev => ev.type === 'beach');
     const extrasList = events.filter(ev => ev.type === 'extra');
 
     const filterByBudget = (item) => {
@@ -268,13 +298,6 @@ export default function HomePage() {
     setGeneratedMsg(msg);
   };
 
-  const uniqueVenues = [...new Set(events.map(ev => ev.venue).filter(Boolean))];
-  const filteredEvents = events.filter(ev => {
-    if (filterCategory !== 'all' && ev.category !== filterCategory) return false;
-    if (filterVenue !== 'all' && ev.venue !== filterVenue) return false;
-    return true;
-  });
-
   const servicesData = {
     beachClubs: ['Scorpios', 'Nammos', 'Principote', 'SantAnna', 'Kalua', 'Anios', 'Super Paradise', 'Tropicana'],
     nightClubs: ['Cavo Paradiso', 'Alemagou', 'Interni', 'Void', 'Monastery'],
@@ -288,9 +311,8 @@ export default function HomePage() {
     transform: isTransitioning ? 'translateX(10px)' : 'translateX(0)'
   };
 
-  // Colori light mode ispirati all'immagine
-  const lightPrimary = '#1E3A5F';      // blu profondo per bottoni principali
-  const lightSecondary = '#4A90E2';    // azzurro per hover e accenti
+  const lightPrimary = '#1E3A5F';
+  const lightSecondary = '#4A90E2';
   const lightBgCard = '#FFFFFF';
   const lightBgAlt = '#F8F9FA';
   const lightText = '#2C3E50';
@@ -298,53 +320,23 @@ export default function HomePage() {
 
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '20px' }}>
-      {/* Barra lingua e tema */}
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: isMobile ? 'space-between' : 'flex-end', 
-        alignItems: 'center', 
-        gap: '12px', 
-        marginBottom: '24px', 
-        flexWrap: 'wrap',
-        width: '100%'
-      }}>
-        <div style={{ 
-          display: 'flex', 
-          gap: '8px', 
-          flex: isMobile ? 1 : 'none', 
-          justifyContent: isMobile ? 'space-evenly' : 'flex-end', 
-          flexWrap: 'wrap',
-          width: isMobile ? '100%' : 'auto'
-        }}>
+      {/* Barra lingua + tema */}
+      <div style={{ display: 'flex', justifyContent: isMobile ? 'space-between' : 'flex-end', alignItems: 'center', gap: '12px', marginBottom: '24px', flexWrap: 'wrap', width: '100%' }}>
+        <div style={{ display: 'flex', gap: '8px', flex: isMobile ? 1 : 'none', justifyContent: isMobile ? 'space-evenly' : 'flex-end', flexWrap: 'wrap', width: isMobile ? '100%' : 'auto' }}>
           {['it','en','fr','es'].map(l => (
             <button key={l} onClick={() => setLang(l)} style={{
               background: lang === l ? (darkMode ? '#38A1F3' : lightPrimary) : 'transparent',
               color: lang === l ? 'white' : (darkMode ? '#E6EDF5' : lightText),
               border: `1px solid ${darkMode ? '#38A1F3' : lightPrimary}`,
-              borderRadius: '40px', 
-              padding: '6px 16px', 
-              cursor: 'pointer', 
-              fontWeight: lang === l ? 'bold' : 'normal',
-              textAlign: 'center'
+              borderRadius: '40px', padding: '6px 16px', cursor: 'pointer', fontWeight: lang === l ? 'bold' : 'normal', textAlign: 'center'
             }}>{l.toUpperCase()}</button>
           ))}
         </div>
-        <button onClick={toggleDark} style={{
-          background: darkMode ? '#F4A261' : lightPrimary,
-          color: 'white', 
-          border: 'none', 
-          borderRadius: '40px', 
-          padding: '6px 16px', 
-          cursor: 'pointer'
-        }}>{darkMode ? '☀️' : '🌙'}</button>
+        <button onClick={toggleDark} style={{ background: darkMode ? '#F4A261' : lightPrimary, color: 'white', border: 'none', borderRadius: '40px', padding: '6px 16px', cursor: 'pointer' }}>{darkMode ? '☀️' : '🌙'}</button>
       </div>
 
       <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-        <h1 style={{
-          fontSize: 'clamp(2rem, 5vw, 3rem)',
-          color: darkMode ? '#38A1F3' : lightPrimary,
-          marginBottom: '8px'
-        }}>🏝️ Mykonos Planning</h1>
+        <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', color: darkMode ? '#38A1F3' : lightPrimary, marginBottom: '8px' }}>🏝️ Mykonos Planning</h1>
         <p style={{ color: darkMode ? '#E6EDF5' : lightTextMuted, opacity: 0.9 }}>{t.subtitle}</p>
       </div>
 
@@ -366,46 +358,46 @@ export default function HomePage() {
       <div style={transitionStyle}>
         {activeTab === 'explore' && (
           <div style={{ background: darkMode ? '#162235' : lightBgCard, borderRadius: '28px', padding: '24px', boxShadow: '0 8px 20px rgba(0,0,0,0.08)' }}>
-            <h2 style={{ marginBottom: '20px', color: darkMode ? '#E6EDF5' : lightText }}>📆 {lang === 'it' ? 'Calendario eventi' : lang === 'en' ? 'Event Calendar' : lang === 'fr' ? 'Calendrier des événements' : 'Calendario de eventos'}</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
+              <h2 style={{ margin: 0, color: darkMode ? '#E6EDF5' : lightText }}>📆 {lang === 'it' ? 'Calendario eventi' : lang === 'en' ? 'Event Calendar' : lang === 'fr' ? 'Calendrier des événements' : 'Calendario de eventos'}</h2>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button onClick={prevMonth} style={{ background: darkMode ? '#0B131F' : lightBgAlt, border: `1px solid ${lightPrimary}`, borderRadius: '40px', padding: '6px 12px', cursor: 'pointer' }}>{t.prevMonth}</button>
+                <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: darkMode ? '#E6EDF5' : lightText }}>{getMonthName()} {currentYear}</span>
+                <button onClick={nextMonth} style={{ background: darkMode ? '#0B131F' : lightBgAlt, border: `1px solid ${lightPrimary}`, borderRadius: '40px', padding: '6px 12px', cursor: 'pointer' }}>{t.nextMonth}</button>
+              </div>
+            </div>
             <div style={{ display: 'flex', gap: '16px', marginBottom: '24px', flexWrap: 'wrap' }}>
-              <select value={filterCategory} onChange={e => setFilterCategory(e.target.value)} style={{
-                padding: '8px 16px', borderRadius: '40px', background: darkMode ? '#0B131F' : lightBgAlt, border: `1px solid ${darkMode ? '#38A1F3' : lightPrimary}`, color: darkMode ? '#E6EDF5' : lightText
-              }}>
+              <select value={filterCategory} onChange={e => setFilterCategory(e.target.value)} style={{ padding: '8px 16px', borderRadius: '40px', background: darkMode ? '#0B131F' : lightBgAlt, border: `1px solid ${darkMode ? '#38A1F3' : lightPrimary}`, color: darkMode ? '#E6EDF5' : lightText }}>
                 <option value="all">{t.all} categorie</option>
                 <option value="Night Club">{t.categories['Night Club']}</option>
                 <option value="Beach Club">{t.categories['Beach Club']}</option>
                 <option value="Restaurant">{t.categories['Restaurant']}</option>
-                <option value="Boat Party">{t.categories['Boat Party']}</option>
               </select>
-              <select value={filterVenue} onChange={e => setFilterVenue(e.target.value)} style={{
-                padding: '8px 16px', borderRadius: '40px', background: darkMode ? '#0B131F' : lightBgAlt, border: `1px solid ${darkMode ? '#38A1F3' : lightPrimary}`, color: darkMode ? '#E6EDF5' : lightText
-              }}>
+              <select value={filterVenue} onChange={e => setFilterVenue(e.target.value)} style={{ padding: '8px 16px', borderRadius: '40px', background: darkMode ? '#0B131F' : lightBgAlt, border: `1px solid ${darkMode ? '#38A1F3' : lightPrimary}`, color: darkMode ? '#E6EDF5' : lightText }}>
                 <option value="all">{t.all} locali</option>
                 {uniqueVenues.map(v => <option key={v} value={v}>{v}</option>)}
               </select>
             </div>
-            {filteredEvents.length === 0 ? (
-              <p style={{ textAlign: 'center', color: darkMode ? '#E6EDF5' : lightTextMuted }}>Nessun evento trovato.</p>
-            ) : (
-              (() => {
-                const sorted = [...filteredEvents].sort((a,b)=>new Date(a.date)-new Date(b.date));
-                const grouped = groupEventsByMonth(sorted);
-                return Object.keys(grouped).map(month => (
-                  <div key={month} style={{ marginBottom: '32px' }}>
-                    <h3 style={{ fontSize: '1.5rem', borderLeft: `4px solid ${darkMode ? '#F4A261' : lightSecondary}`, paddingLeft: '12px', marginBottom: '16px', color: darkMode ? '#E6EDF5' : lightText }}>{month}</h3>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px,1fr))', gap: '16px' }}>
-                      {grouped[month].map(ev => (
-                        <div key={ev.id} style={{ background: darkMode ? '#0B131F' : lightBgAlt, borderRadius: '20px', padding: '16px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', borderBottom: `2px solid ${darkMode ? '#38A1F3' : lightPrimary}` }}>
-                          <div style={{ fontSize: '0.9rem', color: darkMode ? '#E6EDF5' : lightTextMuted, fontWeight: 'bold', marginBottom: '8px' }}>{ev.date}</div>
-                          <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: darkMode ? '#38A1F3' : lightPrimary, marginBottom: '6px' }}>{ev.name}</div>
-                          <div style={{ color: darkMode ? '#E6EDF5' : lightText, opacity: 0.8 }}>{ev.venue}</div>
-                          <div style={{ marginTop: '8px', display: 'inline-block', background: darkMode ? '#F4A26120' : `${lightSecondary}20`, padding: '4px 12px', borderRadius: '20px', fontSize: '0.75rem', color: darkMode ? '#F4A261' : lightSecondary }}>{t.categories[ev.category] || ev.category}</div>
-                        </div>
-                      ))}
+            {daysArray.map(day => {
+              const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+              const dayEvents = eventsByDay[dateStr] || [];
+              if (dayEvents.length === 0) return null; // salta giorni senza eventi
+              const dateObj = new Date(currentYear, currentMonth, day);
+              const dayName = t.dayNames[dateObj.getDay()];
+              return (
+                <div key={day} style={{ marginBottom: '24px', borderBottom: `1px solid ${darkMode ? '#334155' : '#e2e8f0'}`, paddingBottom: '16px' }}>
+                  <h3 style={{ fontSize: '1.2rem', color: darkMode ? '#E6EDF5' : lightText, marginBottom: '12px' }}>{dayName} {day} {getMonthName()}</h3>
+                  {dayEvents.map(ev => (
+                    <div key={ev.id} style={{ background: darkMode ? '#0B131F' : lightBgAlt, borderRadius: '16px', padding: '12px', marginBottom: '10px', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div><strong>{ev.name}</strong> @ {ev.venue}</div>
+                      <div style={{ background: `${lightSecondary}20`, padding: '4px 12px', borderRadius: '20px', fontSize: '0.75rem' }}>{t.categories[ev.category] || ev.category}</div>
                     </div>
-                  </div>
-                ));
-              })()
+                  ))}
+                </div>
+              );
+            })}
+            {daysArray.every(day => (eventsByDay[`${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`] || []).length === 0 && (
+              <p style={{ textAlign: 'center', color: darkMode ? '#E6EDF5' : lightTextMuted }}>Nessun evento in questo mese con i filtri selezionati.</p>
             )}
           </div>
         )}
@@ -485,23 +477,17 @@ export default function HomePage() {
 }
 
 const inputStyle = (darkMode, hasError, primaryColor) => ({
-  width: '100%',
-  padding: '12px',
-  borderRadius: '48px',
+  width: '100%', padding: '12px', borderRadius: '48px',
   border: hasError ? '2px solid #E03B7B' : `1px solid ${darkMode ? '#38A1F3' : primaryColor}`,
   background: darkMode ? '#0B131F' : '#FFFFFF',
   color: darkMode ? '#E6EDF5' : '#2C3E50',
-  fontSize: '1rem',
-  boxSizing: 'border-box'
+  fontSize: '1rem', boxSizing: 'border-box'
 });
 
 const selectStyle = (darkMode, hasError, primaryColor) => ({
-  width: '100%',
-  padding: '12px',
-  borderRadius: '48px',
+  width: '100%', padding: '12px', borderRadius: '48px',
   border: hasError ? '2px solid #E03B7B' : `1px solid ${darkMode ? '#38A1F3' : primaryColor}`,
   background: darkMode ? '#0B131F' : '#FFFFFF',
   color: darkMode ? '#E6EDF5' : '#2C3E50',
-  fontSize: '1rem',
-  boxSizing: 'border-box'
+  fontSize: '1rem', boxSizing: 'border-box'
 });
