@@ -7,7 +7,7 @@ export default function HomePage() {
   const [lang, setLang] = useState('it');
   const [activeTab, setActiveTab] = useState('explore');
   const [formData, setFormData] = useState({
-    name: '', groupSize: 2, arrivalDate: '', stayDays: '7', customDays: '', budget: 'mid'
+    name: '', groupSize: '2', arrivalDate: '', stayDays: '7', customDays: '', budget: 'mid'
   });
   const [generatedMsg, setGeneratedMsg] = useState('');
   const [errors, setErrors] = useState({});
@@ -241,7 +241,6 @@ export default function HomePage() {
 
   const uniqueVenues = [...new Set(validEvents.map(ev => ev.venue).filter(Boolean))];
 
-  // Mappa colori per venue
   const venueColors = {};
   const colorPalette = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8', '#F7B787', '#B5EAD7', '#C7CEE6', '#FFB347', '#AEC6CF'];
   uniqueVenues.forEach((venue, idx) => {
@@ -252,10 +251,11 @@ export default function HomePage() {
   const validateForm = () => {
     let err = {};
     if (!formData.name.trim()) err.name = true;
-    if (!formData.groupSize || formData.groupSize < 1) err.groupSize = true;
+    const groupNum = parseInt(formData.groupSize);
+    if (isNaN(groupNum) || groupNum < 1) err.groupSize = true;
     if (!formData.arrivalDate) err.arrivalDate = true;
     let days = formData.stayDays === 'custom' ? formData.customDays : formData.stayDays;
-    if (!days || days <= 0) err.stayDays = true;
+    if (!days || parseInt(days) <= 0) err.stayDays = true;
     setErrors(err);
     return Object.keys(err).length === 0;
   };
@@ -266,6 +266,7 @@ export default function HomePage() {
     if (isNaN(days)) days = 7;
     const startDate = new Date(formData.arrivalDate);
     const budgetLevel = formData.budget;
+    const groupNum = parseInt(formData.groupSize) || 1;
 
     const endDate = new Date(startDate);
     endDate.setDate(startDate.getDate() + days - 1);
@@ -325,7 +326,7 @@ export default function HomePage() {
       itinerary += `   ⚡ ${t.extraLabel}: ${extraSuggestion}\n`;
     }
     
-    const msg = `🏝️ MYKONOS PLANNING 🏝️\n━━━━━━━━━━━━━━━━━━\n👤 ${t.name}: ${formData.name}\n👥 ${t.group}: ${formData.groupSize}\n📅 ${t.arrival}: ${formData.arrivalDate}\n⏱️ ${t.days}: ${days}\n💰 ${t.budgetLabel}: ${formData.budget === 'luxury' ? 'Luxury' : formData.budget === 'mid' ? 'Mid Range' : 'Budget'}\n${itinerary}`;
+    const msg = `🏝️ MYKONOS PLANNING 🏝️\n━━━━━━━━━━━━━━━━━━\n👤 ${t.name}: ${formData.name}\n👥 ${t.group}: ${groupNum}\n📅 ${t.arrival}: ${formData.arrivalDate}\n⏱️ ${t.days}: ${days}\n💰 ${t.budgetLabel}: ${formData.budget === 'luxury' ? 'Luxury' : formData.budget === 'mid' ? 'Mid Range' : 'Budget'}\n${itinerary}`;
     setGeneratedMsg(msg);
   };
 
@@ -510,17 +511,32 @@ export default function HomePage() {
               <div>
                 <label style={{ fontWeight: 'bold', color: darkMode ? '#E6EDF5' : lightText, fontSize: isMobile ? '0.9rem' : '1rem' }}>{t.group}</label>
                 <small style={{ display: 'block', color: darkMode ? '#E6EDF5' : lightTextMuted, fontSize: isMobile ? '0.8rem' : '0.9rem' }}>{t.groupDesc}</small>
-                <input type="number" min="1" value={formData.groupSize} onChange={e=>setFormData({...formData,groupSize:parseInt(e.target.value)||1})} style={{
-                  ...inputStyle(darkMode, errors.groupSize, darkMode ? accentBlue : lightPrimary, isMobile),
-                  appearance: 'textfield',
-                  MozAppearance: 'textfield',
-                  WebkitAppearance: 'none'
-                }} />
+                <input 
+                  type="text" 
+                  inputMode="numeric" 
+                  pattern="\d*"
+                  value={formData.groupSize} 
+                  onChange={e => {
+                    const val = e.target.value.replace(/\D/g, '');
+                    setFormData({...formData, groupSize: val === '' ? '' : parseInt(val).toString()});
+                  }}
+                  style={{
+                    ...inputStyle(darkMode, errors.groupSize, darkMode ? accentBlue : lightPrimary, isMobile),
+                    appearance: 'textfield',
+                    MozAppearance: 'textfield',
+                    WebkitAppearance: 'none'
+                  }}
+                  placeholder="es. 4"
+                />
               </div>
               <div>
                 <label style={{ fontWeight: 'bold', color: darkMode ? '#E6EDF5' : lightText, fontSize: isMobile ? '0.9rem' : '1rem' }}>{t.arrival}</label>
                 <small style={{ display: 'block', color: darkMode ? '#E6EDF5' : lightTextMuted, fontSize: isMobile ? '0.8rem' : '0.9rem' }}>{t.arrivalDesc}</small>
-                <input type="date" value={formData.arrivalDate} onChange={e=>setFormData({...formData,arrivalDate:e.target.value})} style={inputStyle(darkMode, errors.arrivalDate, darkMode ? accentBlue : lightPrimary, isMobile)} />
+                <input type="date" value={formData.arrivalDate} onChange={e=>setFormData({...formData,arrivalDate:e.target.value})} style={{
+                  ...inputStyle(darkMode, errors.arrivalDate, darkMode ? accentBlue : lightPrimary, isMobile),
+                  boxSizing: 'border-box',
+                  maxWidth: '100%'
+                }} />
               </div>
               <div>
                 <label style={{ fontWeight: 'bold', color: darkMode ? '#E6EDF5' : lightText, fontSize: isMobile ? '0.9rem' : '1rem' }}>{t.days}</label>
