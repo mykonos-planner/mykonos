@@ -2,14 +2,16 @@ export const dynamic = 'force-dynamic';
 
 import { Redis } from '@upstash/redis';
 
-// Client Redis lazy (inizializzato solo al primo utilizzo)
 let redisClient = null;
 function getRedis() {
   if (!redisClient) {
-    redisClient = new Redis({
-      url: process.env.KV_URL,
-      token: process.env.KV_REST_API_TOKEN,
-    });
+    const url = process.env.KV_URL;
+    const token = process.env.KV_REST_API_TOKEN;
+    if (!url || !token) {
+      console.error('Redis credentials missing: KV_URL or KV_REST_API_TOKEN');
+      return null;
+    }
+    redisClient = new Redis({ url, token });
   }
   return redisClient;
 }
@@ -17,18 +19,25 @@ function getRedis() {
 export async function GET() {
   try {
     const redis = getRedis();
+    if (!redis) {
+      return Response.json({ events: [], error: 'Redis non configurato' }, { status: 500 });
+    }
     let events = await redis.lrange('events', 0, -1);
     if (!events) events = [];
     events = events.map(e => typeof e === 'string' ? JSON.parse(e) : e);
     return Response.json({ events });
   } catch (error) {
     console.error('Redis GET error:', error);
-    return Response.json({ events: [] });
+    return Response.json({ events: [], error: error.message }, { status: 500 });
   }
 }
 
 export async function POST(request) {
   try {
+    const redis = getRedis();
+    if (!redis) {
+      return Response.json({ error: 'Redis non configurato' }, { status: 500 });
+    }
     const body = await request.json();
     const { secret, action, event } = body;
     
@@ -63,13 +72,11 @@ export async function POST(request) {
         ...(event.type && { type: event.type })
       };
       
-      const redis = getRedis();
       await redis.rpush('events', JSON.stringify(newEvent));
       return Response.json({ success: true, event: newEvent });
     }
     
     if (action === 'delete') {
-      const redis = getRedis();
       const all = await redis.lrange('events', 0, -1);
       const filtered = all.filter(e => {
         const obj = typeof e === 'string' ? JSON.parse(e) : e;
