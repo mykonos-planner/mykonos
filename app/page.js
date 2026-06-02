@@ -16,7 +16,6 @@ export default function HomePage() {
   const [filterVenue, setFilterVenue] = useState('all');
   const [isMobile, setIsMobile] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [nextTab, setNextTab] = useState(null);
 
   useEffect(() => {
     fetch('/api/events')
@@ -36,8 +35,9 @@ export default function HomePage() {
       document.body.style.backgroundColor = '#0B131F';
       document.body.style.color = '#E6EDF5';
     } else {
-      document.body.style.backgroundColor = '#EAF7FA';   // acqua limpida
-      document.body.style.color = '#3E4A5B';            // pietra
+      // Nuova palette light mode ispirata all'immagine
+      document.body.style.backgroundColor = '#FDFBF7';
+      document.body.style.color = '#2C3E50';
     }
   };
 
@@ -51,14 +51,13 @@ export default function HomePage() {
   const changeTab = (newTab) => {
     if (newTab === activeTab) return;
     setIsTransitioning(true);
-    setNextTab(newTab);
     setTimeout(() => {
       setActiveTab(newTab);
       setIsTransitioning(false);
     }, 200);
   };
 
-  // Traduzioni (stesse di prima)
+  // Traduzioni (identiche a prima)
   const translations = {
     it: {
       explore: '📅 Eventi',
@@ -289,6 +288,14 @@ export default function HomePage() {
     transform: isTransitioning ? 'translateX(10px)' : 'translateX(0)'
   };
 
+  // Colori light mode ispirati all'immagine
+  const lightPrimary = '#1E3A5F';      // blu profondo per bottoni principali
+  const lightSecondary = '#4A90E2';    // azzurro per hover e accenti
+  const lightBgCard = '#FFFFFF';
+  const lightBgAlt = '#F8F9FA';
+  const lightText = '#2C3E50';
+  const lightTextMuted = '#5D6D7E';
+
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '20px' }}>
       {/* Barra lingua e tema */}
@@ -311,9 +318,9 @@ export default function HomePage() {
         }}>
           {['it','en','fr','es'].map(l => (
             <button key={l} onClick={() => setLang(l)} style={{
-              background: lang === l ? (darkMode ? '#38A1F3' : '#2A9D8F') : 'transparent',
-              color: lang === l ? 'white' : (darkMode ? '#E6EDF5' : '#3E4A5B'),
-              border: `1px solid ${darkMode ? '#38A1F3' : '#2A9D8F'}`,
+              background: lang === l ? (darkMode ? '#38A1F3' : lightPrimary) : 'transparent',
+              color: lang === l ? 'white' : (darkMode ? '#E6EDF5' : lightText),
+              border: `1px solid ${darkMode ? '#38A1F3' : lightPrimary}`,
               borderRadius: '40px', 
               padding: '6px 16px', 
               cursor: 'pointer', 
@@ -323,7 +330,7 @@ export default function HomePage() {
           ))}
         </div>
         <button onClick={toggleDark} style={{
-          background: darkMode ? '#F4A261' : '#2A9D8F', 
+          background: darkMode ? '#F4A261' : lightPrimary,
           color: 'white', 
           border: 'none', 
           borderRadius: '40px', 
@@ -335,18 +342,18 @@ export default function HomePage() {
       <div style={{ textAlign: 'center', marginBottom: '40px' }}>
         <h1 style={{
           fontSize: 'clamp(2rem, 5vw, 3rem)',
-          color: darkMode ? '#38A1F3' : '#2A9D8F',
+          color: darkMode ? '#38A1F3' : lightPrimary,
           marginBottom: '8px'
         }}>🏝️ Mykonos Planning</h1>
-        <p style={{ color: darkMode ? '#E6EDF5' : '#6B7B8D', opacity: 0.9 }}>{t.subtitle}</p>
+        <p style={{ color: darkMode ? '#E6EDF5' : lightTextMuted, opacity: 0.9 }}>{t.subtitle}</p>
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', marginBottom: '40px', flexWrap: 'wrap' }}>
         {['explore','planning','services'].map(tab => (
           <button key={tab} onClick={() => changeTab(tab)} style={{
-            background: activeTab === tab ? (darkMode ? '#38A1F3' : '#2A9D8F') : (darkMode ? '#162235' : 'white'),
-            color: activeTab === tab ? 'white' : (darkMode ? '#E6EDF5' : '#3E4A5B'),
-            border: `1px solid ${darkMode ? '#38A1F3' : '#2A9D8F'}`,
+            background: activeTab === tab ? (darkMode ? '#38A1F3' : lightPrimary) : (darkMode ? '#162235' : lightBgAlt),
+            color: activeTab === tab ? 'white' : (darkMode ? '#E6EDF5' : lightText),
+            border: activeTab === tab ? 'none' : `1px solid ${lightPrimary}`,
             padding: '10px 24px', borderRadius: '40px', fontWeight: 'bold', cursor: 'pointer'
           }}>
             {tab === 'explore' && t.explore}
@@ -358,11 +365,11 @@ export default function HomePage() {
 
       <div style={transitionStyle}>
         {activeTab === 'explore' && (
-          <div style={{ background: darkMode ? '#162235' : 'white', borderRadius: '28px', padding: '24px', boxShadow: '0 8px 20px rgba(0,0,0,0.08)' }}>
-            <h2 style={{ marginBottom: '20px', color: darkMode ? '#E6EDF5' : '#3E4A5B' }}>📆 {lang === 'it' ? 'Calendario eventi' : lang === 'en' ? 'Event Calendar' : lang === 'fr' ? 'Calendrier des événements' : 'Calendario de eventos'}</h2>
+          <div style={{ background: darkMode ? '#162235' : lightBgCard, borderRadius: '28px', padding: '24px', boxShadow: '0 8px 20px rgba(0,0,0,0.08)' }}>
+            <h2 style={{ marginBottom: '20px', color: darkMode ? '#E6EDF5' : lightText }}>📆 {lang === 'it' ? 'Calendario eventi' : lang === 'en' ? 'Event Calendar' : lang === 'fr' ? 'Calendrier des événements' : 'Calendario de eventos'}</h2>
             <div style={{ display: 'flex', gap: '16px', marginBottom: '24px', flexWrap: 'wrap' }}>
               <select value={filterCategory} onChange={e => setFilterCategory(e.target.value)} style={{
-                padding: '8px 16px', borderRadius: '40px', background: darkMode ? '#0B131F' : '#EAF7FA', border: `1px solid ${darkMode ? '#38A1F3' : '#2A9D8F'}`, color: darkMode ? '#E6EDF5' : '#3E4A5B'
+                padding: '8px 16px', borderRadius: '40px', background: darkMode ? '#0B131F' : lightBgAlt, border: `1px solid ${darkMode ? '#38A1F3' : lightPrimary}`, color: darkMode ? '#E6EDF5' : lightText
               }}>
                 <option value="all">{t.all} categorie</option>
                 <option value="Night Club">{t.categories['Night Club']}</option>
@@ -371,28 +378,28 @@ export default function HomePage() {
                 <option value="Boat Party">{t.categories['Boat Party']}</option>
               </select>
               <select value={filterVenue} onChange={e => setFilterVenue(e.target.value)} style={{
-                padding: '8px 16px', borderRadius: '40px', background: darkMode ? '#0B131F' : '#EAF7FA', border: `1px solid ${darkMode ? '#38A1F3' : '#2A9D8F'}`, color: darkMode ? '#E6EDF5' : '#3E4A5B'
+                padding: '8px 16px', borderRadius: '40px', background: darkMode ? '#0B131F' : lightBgAlt, border: `1px solid ${darkMode ? '#38A1F3' : lightPrimary}`, color: darkMode ? '#E6EDF5' : lightText
               }}>
                 <option value="all">{t.all} locali</option>
                 {uniqueVenues.map(v => <option key={v} value={v}>{v}</option>)}
               </select>
             </div>
             {filteredEvents.length === 0 ? (
-              <p style={{ textAlign: 'center', color: darkMode ? '#E6EDF5' : '#6B7B8D' }}>Nessun evento trovato.</p>
+              <p style={{ textAlign: 'center', color: darkMode ? '#E6EDF5' : lightTextMuted }}>Nessun evento trovato.</p>
             ) : (
               (() => {
                 const sorted = [...filteredEvents].sort((a,b)=>new Date(a.date)-new Date(b.date));
                 const grouped = groupEventsByMonth(sorted);
                 return Object.keys(grouped).map(month => (
                   <div key={month} style={{ marginBottom: '32px' }}>
-                    <h3 style={{ fontSize: '1.5rem', borderLeft: `4px solid ${darkMode ? '#F4A261' : '#2A9D8F'}`, paddingLeft: '12px', marginBottom: '16px', color: darkMode ? '#E6EDF5' : '#3E4A5B' }}>{month}</h3>
+                    <h3 style={{ fontSize: '1.5rem', borderLeft: `4px solid ${darkMode ? '#F4A261' : lightSecondary}`, paddingLeft: '12px', marginBottom: '16px', color: darkMode ? '#E6EDF5' : lightText }}>{month}</h3>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px,1fr))', gap: '16px' }}>
                       {grouped[month].map(ev => (
-                        <div key={ev.id} style={{ background: darkMode ? '#0B131F' : '#F9FCFD', borderRadius: '20px', padding: '16px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', borderBottom: `2px solid ${darkMode ? '#38A1F3' : '#2A9D8F'}` }}>
-                          <div style={{ fontSize: '0.9rem', color: darkMode ? '#E6EDF5' : '#6B7B8D', fontWeight: 'bold', marginBottom: '8px' }}>{ev.date}</div>
-                          <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: darkMode ? '#38A1F3' : '#2A9D8F', marginBottom: '6px' }}>{ev.name}</div>
-                          <div style={{ color: darkMode ? '#E6EDF5' : '#3E4A5B', opacity: 0.8 }}>{ev.venue}</div>
-                          <div style={{ marginTop: '8px', display: 'inline-block', background: darkMode ? '#F4A26120' : '#2A9D8F20', padding: '4px 12px', borderRadius: '20px', fontSize: '0.75rem', color: darkMode ? '#F4A261' : '#2A9D8F' }}>{t.categories[ev.category] || ev.category}</div>
+                        <div key={ev.id} style={{ background: darkMode ? '#0B131F' : lightBgAlt, borderRadius: '20px', padding: '16px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', borderBottom: `2px solid ${darkMode ? '#38A1F3' : lightPrimary}` }}>
+                          <div style={{ fontSize: '0.9rem', color: darkMode ? '#E6EDF5' : lightTextMuted, fontWeight: 'bold', marginBottom: '8px' }}>{ev.date}</div>
+                          <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: darkMode ? '#38A1F3' : lightPrimary, marginBottom: '6px' }}>{ev.name}</div>
+                          <div style={{ color: darkMode ? '#E6EDF5' : lightText, opacity: 0.8 }}>{ev.venue}</div>
+                          <div style={{ marginTop: '8px', display: 'inline-block', background: darkMode ? '#F4A26120' : `${lightSecondary}20`, padding: '4px 12px', borderRadius: '20px', fontSize: '0.75rem', color: darkMode ? '#F4A261' : lightSecondary }}>{t.categories[ev.category] || ev.category}</div>
                         </div>
                       ))}
                     </div>
@@ -404,44 +411,44 @@ export default function HomePage() {
         )}
 
         {activeTab === 'planning' && (
-          <div style={{ background: darkMode ? '#162235' : 'white', borderRadius: '28px', padding: '24px', boxShadow: '0 8px 20px rgba(0,0,0,0.08)' }}>
-            <h2 style={{ color: darkMode ? '#E6EDF5' : '#3E4A5B' }}>✍️ {lang === 'it' ? 'Crea il tuo programma' : lang === 'en' ? 'Create your program' : lang === 'fr' ? 'Créez votre programme' : 'Crea tu programa'}</h2>
+          <div style={{ background: darkMode ? '#162235' : lightBgCard, borderRadius: '28px', padding: '24px', boxShadow: '0 8px 20px rgba(0,0,0,0.08)' }}>
+            <h2 style={{ color: darkMode ? '#E6EDF5' : lightText }}>✍️ {lang === 'it' ? 'Crea il tuo programma' : lang === 'en' ? 'Create your program' : lang === 'fr' ? 'Créez votre programme' : 'Crea tu programa'}</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginTop: '20px' }}>
               <div>
-                <label style={{ fontWeight: 'bold', color: darkMode ? '#E6EDF5' : '#3E4A5B' }}>{t.name}</label>
-                <small style={{ display: 'block', color: darkMode ? '#E6EDF5' : '#6B7B8D' }}>{t.nameDesc}</small>
-                <input type="text" value={formData.name} onChange={e=>setFormData({...formData,name:e.target.value})} style={inputStyle(darkMode, errors.name)} />
+                <label style={{ fontWeight: 'bold', color: darkMode ? '#E6EDF5' : lightText }}>{t.name}</label>
+                <small style={{ display: 'block', color: darkMode ? '#E6EDF5' : lightTextMuted }}>{t.nameDesc}</small>
+                <input type="text" value={formData.name} onChange={e=>setFormData({...formData,name:e.target.value})} style={inputStyle(darkMode, errors.name, lightPrimary)} />
               </div>
               <div>
-                <label style={{ fontWeight: 'bold', color: darkMode ? '#E6EDF5' : '#3E4A5B' }}>{t.group}</label>
-                <small style={{ display: 'block', color: darkMode ? '#E6EDF5' : '#6B7B8D' }}>{t.groupDesc}</small>
-                <input type="number" min="1" value={formData.groupSize} onChange={e=>setFormData({...formData,groupSize:parseInt(e.target.value)||1})} style={inputStyle(darkMode, errors.groupSize)} />
+                <label style={{ fontWeight: 'bold', color: darkMode ? '#E6EDF5' : lightText }}>{t.group}</label>
+                <small style={{ display: 'block', color: darkMode ? '#E6EDF5' : lightTextMuted }}>{t.groupDesc}</small>
+                <input type="number" min="1" value={formData.groupSize} onChange={e=>setFormData({...formData,groupSize:parseInt(e.target.value)||1})} style={inputStyle(darkMode, errors.groupSize, lightPrimary)} />
               </div>
               <div>
-                <label style={{ fontWeight: 'bold', color: darkMode ? '#E6EDF5' : '#3E4A5B' }}>{t.arrival}</label>
-                <small style={{ display: 'block', color: darkMode ? '#E6EDF5' : '#6B7B8D' }}>{t.arrivalDesc}</small>
-                <input type="date" value={formData.arrivalDate} onChange={e=>setFormData({...formData,arrivalDate:e.target.value})} style={inputStyle(darkMode, errors.arrivalDate)} />
+                <label style={{ fontWeight: 'bold', color: darkMode ? '#E6EDF5' : lightText }}>{t.arrival}</label>
+                <small style={{ display: 'block', color: darkMode ? '#E6EDF5' : lightTextMuted }}>{t.arrivalDesc}</small>
+                <input type="date" value={formData.arrivalDate} onChange={e=>setFormData({...formData,arrivalDate:e.target.value})} style={inputStyle(darkMode, errors.arrivalDate, lightPrimary)} />
               </div>
               <div>
-                <label style={{ fontWeight: 'bold', color: darkMode ? '#E6EDF5' : '#3E4A5B' }}>{t.days}</label>
-                <small style={{ display: 'block', color: darkMode ? '#E6EDF5' : '#6B7B8D' }}>{t.daysDesc}</small>
-                <select value={formData.stayDays} onChange={e=>setFormData({...formData,stayDays:e.target.value})} style={selectStyle(darkMode, errors.stayDays)}>
+                <label style={{ fontWeight: 'bold', color: darkMode ? '#E6EDF5' : lightText }}>{t.days}</label>
+                <small style={{ display: 'block', color: darkMode ? '#E6EDF5' : lightTextMuted }}>{t.daysDesc}</small>
+                <select value={formData.stayDays} onChange={e=>setFormData({...formData,stayDays:e.target.value})} style={selectStyle(darkMode, errors.stayDays, lightPrimary)}>
                   <option value="3">3</option><option value="5">5</option><option value="7">7</option><option value="10">10</option><option value="14">14</option><option value="custom">Custom</option>
                 </select>
-                {formData.stayDays === 'custom' && <input type="number" placeholder="#" value={formData.customDays} onChange={e=>setFormData({...formData,customDays:e.target.value})} style={{ ...inputStyle(darkMode, false), marginTop: '10px' }} />}
+                {formData.stayDays === 'custom' && <input type="number" placeholder="#" value={formData.customDays} onChange={e=>setFormData({...formData,customDays:e.target.value})} style={{ ...inputStyle(darkMode, false, lightPrimary), marginTop: '10px' }} />}
               </div>
               <div>
-                <label style={{ fontWeight: 'bold', color: darkMode ? '#E6EDF5' : '#3E4A5B' }}>{t.budgetLabel}</label>
-                <small style={{ display: 'block', color: darkMode ? '#E6EDF5' : '#6B7B8D' }}>{t.budgetDesc}</small>
-                <select value={formData.budget} onChange={e=>setFormData({...formData,budget:e.target.value})} style={selectStyle(darkMode, false)}>
+                <label style={{ fontWeight: 'bold', color: darkMode ? '#E6EDF5' : lightText }}>{t.budgetLabel}</label>
+                <small style={{ display: 'block', color: darkMode ? '#E6EDF5' : lightTextMuted }}>{t.budgetDesc}</small>
+                <select value={formData.budget} onChange={e=>setFormData({...formData,budget:e.target.value})} style={selectStyle(darkMode, false, lightPrimary)}>
                   <option value="luxury">💰 Luxury</option><option value="mid">💵 Mid Range</option><option value="budget">🟢 Budget</option>
                 </select>
               </div>
-              <button onClick={generateItinerary} style={{ background: darkMode ? '#38A1F3' : '#2A9D8F', color: 'white', border: 'none', padding: '14px', borderRadius: '48px', fontWeight: 'bold', cursor: 'pointer' }}>{t.generate}</button>
+              <button onClick={generateItinerary} style={{ background: darkMode ? '#38A1F3' : lightPrimary, color: 'white', border: 'none', padding: '14px', borderRadius: '48px', fontWeight: 'bold', cursor: 'pointer' }}>{t.generate}</button>
               {generatedMsg && (
-                <div style={{ marginTop: '20px', background: darkMode ? '#0B131F' : '#EAF7FA', padding: '20px', borderRadius: '24px', whiteSpace: 'pre-wrap', fontFamily: 'monospace', color: darkMode ? '#E6EDF5' : '#3E4A5B' }}>
+                <div style={{ marginTop: '20px', background: darkMode ? '#0B131F' : lightBgAlt, padding: '20px', borderRadius: '24px', whiteSpace: 'pre-wrap', fontFamily: 'monospace', color: darkMode ? '#E6EDF5' : lightText }}>
                   {generatedMsg}
-                  <button onClick={()=>{navigator.clipboard.writeText(generatedMsg); alert('Copiato!');}} style={{ marginTop: '12px', background: '#2A9D8F', color: 'white', padding: '8px 20px', borderRadius: '40px', border: 'none', cursor: 'pointer' }}>{t.copy}</button>
+                  <button onClick={()=>{navigator.clipboard.writeText(generatedMsg); alert('Copiato!');}} style={{ marginTop: '12px', background: lightSecondary, color: 'white', padding: '8px 20px', borderRadius: '40px', border: 'none', cursor: 'pointer' }}>{t.copy}</button>
                 </div>
               )}
             </div>
@@ -449,27 +456,27 @@ export default function HomePage() {
         )}
 
         {activeTab === 'services' && (
-          <div style={{ background: darkMode ? '#162235' : 'white', borderRadius: '28px', padding: '24px', boxShadow: '0 8px 20px rgba(0,0,0,0.08)' }}>
-            <h2 style={{ color: darkMode ? '#E6EDF5' : '#3E4A5B' }}>🏛️ {lang === 'it' ? 'Scopri Mykonos' : lang === 'en' ? 'Discover Mykonos' : lang === 'fr' ? 'Découvrez Mykonos' : 'Descubre Mykonos'}</h2>
+          <div style={{ background: darkMode ? '#162235' : lightBgCard, borderRadius: '28px', padding: '24px', boxShadow: '0 8px 20px rgba(0,0,0,0.08)' }}>
+            <h2 style={{ color: darkMode ? '#E6EDF5' : lightText }}>🏛️ {lang === 'it' ? 'Scopri Mykonos' : lang === 'en' ? 'Discover Mykonos' : lang === 'fr' ? 'Découvrez Mykonos' : 'Descubre Mykonos'}</h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px,1fr))', gap: '24px', marginTop: '24px' }}>
-              <div style={{ background: darkMode ? '#0B131F' : '#EAF7FA', borderRadius: '20px', padding: '16px' }}>
-                <h3 style={{ color: darkMode ? '#38A1F3' : '#2A9D8F', marginBottom: '12px' }}>🏖️ {t.beachClubs}</h3>
-                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>{servicesData.beachClubs.map(c => <li key={c} style={{ marginBottom: '8px', color: darkMode ? '#E6EDF5' : '#3E4A5B' }}>🌊 {c}</li>)}</ul>
+              <div style={{ background: darkMode ? '#0B131F' : lightBgAlt, borderRadius: '20px', padding: '16px' }}>
+                <h3 style={{ color: darkMode ? '#38A1F3' : lightPrimary, marginBottom: '12px' }}>🏖️ {t.beachClubs}</h3>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>{servicesData.beachClubs.map(c => <li key={c} style={{ marginBottom: '8px', color: darkMode ? '#E6EDF5' : lightText }}>🌊 {c}</li>)}</ul>
               </div>
-              <div style={{ background: darkMode ? '#0B131F' : '#EAF7FA', borderRadius: '20px', padding: '16px' }}>
-                <h3 style={{ color: darkMode ? '#38A1F3' : '#2A9D8F', marginBottom: '12px' }}>🎧 {t.nightClubs}</h3>
-                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>{servicesData.nightClubs.map(c => <li key={c} style={{ marginBottom: '8px', color: darkMode ? '#E6EDF5' : '#3E4A5B' }}>🎵 {c}</li>)}</ul>
+              <div style={{ background: darkMode ? '#0B131F' : lightBgAlt, borderRadius: '20px', padding: '16px' }}>
+                <h3 style={{ color: darkMode ? '#38A1F3' : lightPrimary, marginBottom: '12px' }}>🎧 {t.nightClubs}</h3>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>{servicesData.nightClubs.map(c => <li key={c} style={{ marginBottom: '8px', color: darkMode ? '#E6EDF5' : lightText }}>🎵 {c}</li>)}</ul>
               </div>
-              <div style={{ background: darkMode ? '#0B131F' : '#EAF7FA', borderRadius: '20px', padding: '16px' }}>
-                <h3 style={{ color: darkMode ? '#38A1F3' : '#2A9D8F', marginBottom: '12px' }}>🍽️ {t.restaurants}</h3>
-                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>{servicesData.restaurants.map(c => <li key={c} style={{ marginBottom: '8px', color: darkMode ? '#E6EDF5' : '#3E4A5B' }}>🍴 {c}</li>)}</ul>
+              <div style={{ background: darkMode ? '#0B131F' : lightBgAlt, borderRadius: '20px', padding: '16px' }}>
+                <h3 style={{ color: darkMode ? '#38A1F3' : lightPrimary, marginBottom: '12px' }}>🍽️ {t.restaurants}</h3>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>{servicesData.restaurants.map(c => <li key={c} style={{ marginBottom: '8px', color: darkMode ? '#E6EDF5' : lightText }}>🍴 {c}</li>)}</ul>
               </div>
-              <div style={{ background: darkMode ? '#0B131F' : '#EAF7FA', borderRadius: '20px', padding: '16px' }}>
-                <h3 style={{ color: darkMode ? '#38A1F3' : '#2A9D8F', marginBottom: '12px' }}>⚡ {t.extras}</h3>
-                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>{servicesData.extras.map(c => <li key={c} style={{ marginBottom: '8px', color: darkMode ? '#E6EDF5' : '#3E4A5B' }}>🚤 {c}</li>)}</ul>
+              <div style={{ background: darkMode ? '#0B131F' : lightBgAlt, borderRadius: '20px', padding: '16px' }}>
+                <h3 style={{ color: darkMode ? '#38A1F3' : lightPrimary, marginBottom: '12px' }}>⚡ {t.extras}</h3>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>{servicesData.extras.map(c => <li key={c} style={{ marginBottom: '8px', color: darkMode ? '#E6EDF5' : lightText }}>🚤 {c}</li>)}</ul>
               </div>
             </div>
-            <p style={{ marginTop: '24px', color: darkMode ? '#E6EDF5' : '#6B7B8D', fontSize: '0.9rem', textAlign: 'center' }}>💡 Per prenotazioni e disponibilità, contattami su WhatsApp!</p>
+            <p style={{ marginTop: '24px', color: darkMode ? '#E6EDF5' : lightTextMuted, fontSize: '0.9rem', textAlign: 'center' }}>💡 Per prenotazioni e disponibilità, contattami su WhatsApp!</p>
           </div>
         )}
       </div>
@@ -477,24 +484,24 @@ export default function HomePage() {
   );
 }
 
-const inputStyle = (darkMode, hasError) => ({
+const inputStyle = (darkMode, hasError, primaryColor) => ({
   width: '100%',
   padding: '12px',
   borderRadius: '48px',
-  border: hasError ? '2px solid #E03B7B' : `1px solid ${darkMode ? '#38A1F3' : '#2A9D8F'}`,
+  border: hasError ? '2px solid #E03B7B' : `1px solid ${darkMode ? '#38A1F3' : primaryColor}`,
   background: darkMode ? '#0B131F' : '#FFFFFF',
-  color: darkMode ? '#E6EDF5' : '#3E4A5B',
+  color: darkMode ? '#E6EDF5' : '#2C3E50',
   fontSize: '1rem',
   boxSizing: 'border-box'
 });
 
-const selectStyle = (darkMode, hasError) => ({
+const selectStyle = (darkMode, hasError, primaryColor) => ({
   width: '100%',
   padding: '12px',
   borderRadius: '48px',
-  border: hasError ? '2px solid #E03B7B' : `1px solid ${darkMode ? '#38A1F3' : '#2A9D8F'}`,
+  border: hasError ? '2px solid #E03B7B' : `1px solid ${darkMode ? '#38A1F3' : primaryColor}`,
   background: darkMode ? '#0B131F' : '#FFFFFF',
-  color: darkMode ? '#E6EDF5' : '#3E4A5B',
+  color: darkMode ? '#E6EDF5' : '#2C3E50',
   fontSize: '1rem',
   boxSizing: 'border-box'
 });
