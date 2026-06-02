@@ -1,12 +1,22 @@
+export const dynamic = 'force-dynamic';
+
 import { Redis } from '@upstash/redis';
 
-const redis = new Redis({
-  url: process.env.KV_URL,
-  token: process.env.KV_REST_API_TOKEN,
-});
+// Client Redis lazy (inizializzato solo al primo utilizzo)
+let redisClient = null;
+function getRedis() {
+  if (!redisClient) {
+    redisClient = new Redis({
+      url: process.env.KV_URL,
+      token: process.env.KV_REST_API_TOKEN,
+    });
+  }
+  return redisClient;
+}
 
 export async function GET() {
   try {
+    const redis = getRedis();
     let events = await redis.lrange('events', 0, -1);
     if (!events) events = [];
     events = events.map(e => typeof e === 'string' ? JSON.parse(e) : e);
@@ -34,33 +44,32 @@ export async function POST(request) {
     }
     
     if (action === 'add') {
-      // Solo il nome è obbligatorio; la data può essere assente o null
       if (!event.name) {
         return Response.json({ error: 'Il nome è obbligatorio' }, { status: 400 });
       }
       
-      // Costruisci l'oggetto mantenendo tutti i campi extra
       const newEvent = {
         id: Date.now().toString(),
         name: event.name,
-        date: event.date || null,        // se non c'è data, metti null
+        date: event.date || null,
         venue: event.venue || '',
         category: event.category || 'Service',
         budget: event.budget || 'mid',
-        // Conserva eventuali campi specifici (ristorante, extra, spiaggia)
         ...(event.cuisine && { cuisine: event.cuisine }),
         ...(event.priceRange && { priceRange: event.priceRange }),
         ...(event.note && { note: event.note }),
         ...(event.serviceType && { serviceType: event.serviceType }),
         ...(event.location && { location: event.location }),
-        ...(event.type && { type: event.type }) // 'restaurant', 'extra', 'beach'
+        ...(event.type && { type: event.type })
       };
       
+      const redis = getRedis();
       await redis.rpush('events', JSON.stringify(newEvent));
       return Response.json({ success: true, event: newEvent });
     }
     
     if (action === 'delete') {
+      const redis = getRedis();
       const all = await redis.lrange('events', 0, -1);
       const filtered = all.filter(e => {
         const obj = typeof e === 'string' ? JSON.parse(e) : e;
