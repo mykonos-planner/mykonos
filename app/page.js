@@ -103,8 +103,8 @@ export default function HomePage() {
       all: 'Tutti',
       dayNames: ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato'],
       morningLabel: 'Mattina',
-      afternoonLabel: 'Pomeriggio',
       lunchLabel: 'Pranzo',
+      afternoonLabel: 'Pomeriggio',
       dinnerLabel: 'Cena',
       eveningLabel: 'Serata',
       prevMonth: '◀',
@@ -137,8 +137,8 @@ export default function HomePage() {
       all: 'All',
       dayNames: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
       morningLabel: 'Morning',
-      afternoonLabel: 'Afternoon',
       lunchLabel: 'Lunch',
+      afternoonLabel: 'Afternoon',
       dinnerLabel: 'Dinner',
       eveningLabel: 'Evening',
       prevMonth: '◀',
@@ -171,8 +171,8 @@ export default function HomePage() {
       all: 'Tous',
       dayNames: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],
       morningLabel: 'Matin',
-      afternoonLabel: 'Après-midi',
       lunchLabel: 'Déjeuner',
+      afternoonLabel: 'Après-midi',
       dinnerLabel: 'Dîner',
       eveningLabel: 'Soirée',
       prevMonth: '◀',
@@ -205,8 +205,8 @@ export default function HomePage() {
       all: 'Todos',
       dayNames: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
       morningLabel: 'Mañana',
-      afternoonLabel: 'Tarde',
       lunchLabel: 'Almuerzo',
+      afternoonLabel: 'Tarde',
       dinnerLabel: 'Cena',
       eveningLabel: 'Noche',
       prevMonth: '◀',
@@ -280,54 +280,55 @@ export default function HomePage() {
     let beachesList = events.filter(ev => ev.type === 'beach');
     let extrasList = events.filter(ev => ev.type === 'extra' && ev.serviceType !== 'scooter' && ev.serviceType !== 'car');
 
-    // Filtro per budget più permissivo per la musica: luxury prende luxury+mid, mid prende mid+budget, budget prende budget+mid (ma senza extra)
-    const filterByBudget = (item, type) => {
+    const filterByBudget = (item) => {
       if (!item.budget) return true;
-      if (budgetLevel === 'luxury') {
-        if (type === 'music') return item.budget === 'luxury' || item.budget === 'mid';
-        return item.budget === 'luxury';
+      if (budgetLevel === 'budget') {
+        return item.budget === 'budget' || item.budget === 'mid';
       } else if (budgetLevel === 'mid') {
-        if (type === 'music') return item.budget === 'mid' || item.budget === 'budget';
         return item.budget === 'mid';
       } else {
-        if (type === 'music') return item.budget === 'budget' || item.budget === 'mid';
-        return item.budget === 'budget';
+        return item.budget === 'luxury';
       }
     };
 
-    musicEvents = musicEvents.filter(ev => filterByBudget(ev, 'music'));
-    restaurantsList = restaurantsList.filter(ev => filterByBudget(ev, 'restaurant'));
-    beachesList = beachesList.filter(ev => filterByBudget(ev, 'beach'));
-    
-    // Extra solo se non budget
-    let filteredExtras = [];
+    restaurantsList = restaurantsList.filter(filterByBudget);
+    beachesList = beachesList.filter(filterByBudget);
+    extrasList = extrasList.filter(filterByBudget);
+    extrasList = extrasList.filter(extra => {
+      const min = extra.minPersons;
+      const max = extra.maxPersons;
+      if (min && groupNum < min) return false;
+      if (max && groupNum > max) return false;
+      return true;
+    });
+
+    // Eventi musicali con fallback per luxury
+    let filteredMusicEvents = musicEvents.filter(filterByBudget);
+    if (budgetLevel === 'luxury' && filteredMusicEvents.length === 0) {
+      filteredMusicEvents = musicEvents.filter(ev => !ev.budget || ev.budget === 'luxury' || ev.budget === 'mid');
+    }
+    musicEvents = filteredMusicEvents;
+
+    // Attività per mattina/pomeriggio: spiagge + extra (solo se non budget)
+    let activitiesList = [...beachesList];
     if (budgetLevel !== 'budget') {
-      filteredExtras = extrasList.filter(ev => filterByBudget(ev, 'extra'));
-      // Filtra extra per numero di persone
-      filteredExtras = filteredExtras.filter(extra => {
-        const min = extra.minPersons;
-        const max = extra.maxPersons;
-        if (min && groupNum < min) return false;
-        if (max && groupNum > max) return false;
-        return true;
-      });
+      activitiesList = [...activitiesList, ...extrasList];
+    }
+    if (activitiesList.length === 0) {
+      activitiesList = [{ name: 'Relax' }];
     }
 
+    let previousLateNight = false;
     let itinerary = '';
-    let previousEveningLate = false; // per decidere se la mattina successiva è relax
 
     for (let i = 0; i < days; i++) {
       const currentDate = new Date(startDate);
       currentDate.setDate(startDate.getDate() + i);
       const dayOfWeek = t.dayNames[currentDate.getDay()];
-      const localizedDate = currentDate.toLocaleDateString(lang, {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric'
-      });
+      const localizedDate = currentDate.toLocaleDateString(lang, { day: 'numeric', month: 'long', year: 'numeric' });
       const formattedDateISO = currentDate.toISOString().slice(0,10);
 
-      // Eventi serali del giorno corrente
+      // Serata
       const dayEvents = musicEvents.filter(ev => ev.date === formattedDateISO);
       let musicSuggestion;
       if (dayEvents.length > 0) {
@@ -339,35 +340,30 @@ export default function HomePage() {
         musicSuggestion = 'Serata libera';
       }
 
-      // Mattina: se la sera precedente era "tardi" (simulato con parola "late" nel nome? Decidiamo arbitrariamente: se l'evento serale contiene "Late" o "After" o l'orario è implicito, ma semplifichiamo: se l'evento è di tipo Night Club e il budget è luxury/mid, consideriamo tardi. Per ora usiamo una regola semplice: se l'evento serale non è "Serata libera" e non è un beach club, consideriamo tardi. In realtà, per semplicità, suggeriamo sempre relax la mattina se il budget è luxury/mid e c'è un evento serale? Non esageriamo.
-      // Decido: se l'evento serale non è "Serata libera", la mattina successiva sarà "Rilassamento in hotel" invece di spiaggia. Per budget, invece, sempre spiaggia libera.
-      let morningSuggestion;
-      if (i > 0 && !previousEveningLate && budgetLevel !== 'budget') {
-        // Se la sera precedente non era tardi, mattina normale
-        const availableBeaches = beachesList;
-        morningSuggestion = availableBeaches.length > 0 ? availableBeaches[i % availableBeaches.length].name : 'Spiaggia libera';
-      } else if (budgetLevel === 'budget') {
-        const availableBeaches = beachesList;
-        morningSuggestion = availableBeaches.length > 0 ? availableBeaches[i % availableBeaches.length].name : 'Spiaggia libera';
-      } else {
-        morningSuggestion = 'Rilassamento in hotel (dopo la serata)';
-      }
-      // Aggiorna previousEveningLate per il giorno successivo: se la serata non è libera e il budget non è budget, allora è tardi
-      previousEveningLate = (musicSuggestion !== 'Serata libera' && budgetLevel !== 'budget');
+      const isLateNight = !musicSuggestion.includes('Serata libera');
 
-      // Pomeriggio: spiaggia o extra (se budget non budget)
-      let afternoonSuggestion;
-      if (budgetLevel !== 'budget' && filteredExtras.length > 0) {
-        const extra = filteredExtras[i % filteredExtras.length];
-        let extraText = extra.name;
-        const req = [];
-        if (extra.minPersons) req.push(`min. ${extra.minPersons} persone`);
-        if (extra.maxPersons) req.push(`max. ${extra.maxPersons} persone`);
-        if (req.length) extraText += ` (${req.join(', ')})`;
-        afternoonSuggestion = extraText;
+      // Mattina: se la sera prima è stata lunga, relax o spiaggia gratuita
+      let morningActivity;
+      if (previousLateNight) {
+        const freeBeaches = beachesList.filter(b => !b.budget || b.budget === 'budget');
+        if (freeBeaches.length > 0) {
+          morningActivity = freeBeaches[i % freeBeaches.length].name;
+        } else {
+          morningActivity = 'Relax';
+        }
       } else {
-        const availableBeaches = beachesList;
-        afternoonSuggestion = availableBeaches.length > 0 ? availableBeaches[i % availableBeaches.length].name : 'Spiaggia libera';
+        morningActivity = activitiesList.length > 0 ? activitiesList[i % activitiesList.length].name : 'Relax';
+      }
+
+      // Pomeriggio: un'attività diversa dalla mattina (se possibile)
+      let afternoonActivity;
+      if (activitiesList.length > 1) {
+        let idx = (i + Math.floor(activitiesList.length / 2)) % activitiesList.length;
+        afternoonActivity = activitiesList[idx].name;
+      } else if (activitiesList.length === 1) {
+        afternoonActivity = activitiesList[0].name;
+      } else {
+        afternoonActivity = 'Relax';
       }
 
       // Ristoranti
@@ -388,14 +384,17 @@ export default function HomePage() {
       }
 
       itinerary += `\n📅 ${dayOfWeek} ${localizedDate}\n`;
-      itinerary += `   🌅 ${t.morningLabel}: ${morningSuggestion}\n`;
-      itinerary += `   ☀️ ${t.afternoonLabel}: ${afternoonSuggestion}\n`;
+      itinerary += `   ☀️ ${t.morningLabel}: ${morningActivity}\n`;
       itinerary += `   🍽️ ${t.lunchLabel}: ${lunchRestaurant}\n`;
+      itinerary += `   🌞 ${t.afternoonLabel}: ${afternoonActivity}\n`;
       itinerary += `   🍽️ ${t.dinnerLabel}: ${dinnerRestaurant}\n`;
       itinerary += `   🎧 ${t.eveningLabel}: ${musicSuggestion}\n`;
+
+      previousLateNight = isLateNight;
     }
-    
-    const msg = `🏝️ MYKONOS PLANNING 🏝️\n━━━━━━━━━━━━━━━━━━\n👤 ${t.name}: ${formData.name}\n👥 ${t.group}: ${groupNum}\n📅 ${t.arrival}: ${formData.arrivalDate}\n⏱️ ${t.days}: ${days}\n💰 ${t.budgetLabel}: ${formData.budget === 'luxury' ? 'Luxury' : formData.budget === 'mid' ? 'Mid Range' : 'Budget'}\n${itinerary}`;
+
+    const groupNumInt = parseInt(formData.groupSize) || 1;
+    const msg = `🏝️ MYKONOS PLANNING 🏝️\n━━━━━━━━━━━━━━━━━━\n👤 ${t.name}: ${formData.name}\n👥 ${t.group}: ${groupNumInt}\n📅 ${t.arrival}: ${formData.arrivalDate}\n⏱️ ${t.days}: ${days}\n💰 ${t.budgetLabel}: ${budgetLevel === 'luxury' ? 'Luxury' : budgetLevel === 'mid' ? 'Mid Range' : 'Budget'}\n${itinerary}`;
     setGeneratedMsg(msg);
   };
 
