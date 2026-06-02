@@ -102,11 +102,13 @@ export default function HomePage() {
       filterVenue: 'Filtra per locale',
       all: 'Tutti',
       dayNames: ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato'],
-      morningLabel: 'Mattina/Pomeriggio',
+      morningLabel: 'Mattina',
+      afternoonLabel: 'Pomeriggio',
       lunchLabel: 'Pranzo',
       dinnerLabel: 'Cena',
       eveningLabel: 'Serata',
-      extraLabel: 'Extra',
+      extraLabel: 'Attività',
+      relaxMorning: 'Rilassamento in hotel (serata precedente fino a tardi)',
       prevMonth: '◀',
       nextMonth: '▶'
     },
@@ -136,11 +138,13 @@ export default function HomePage() {
       filterVenue: 'Filter by venue',
       all: 'All',
       dayNames: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-      morningLabel: 'Morning/Afternoon',
+      morningLabel: 'Morning',
+      afternoonLabel: 'Afternoon',
       lunchLabel: 'Lunch',
       dinnerLabel: 'Dinner',
       eveningLabel: 'Evening',
-      extraLabel: 'Extra',
+      extraLabel: 'Activity',
+      relaxMorning: 'Relax at hotel (late night before)',
       prevMonth: '◀',
       nextMonth: '▶'
     },
@@ -170,11 +174,13 @@ export default function HomePage() {
       filterVenue: 'Filtrer par lieu',
       all: 'Tous',
       dayNames: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],
-      morningLabel: 'Matin/Après-midi',
+      morningLabel: 'Matin',
+      afternoonLabel: 'Après-midi',
       lunchLabel: 'Déjeuner',
       dinnerLabel: 'Dîner',
       eveningLabel: 'Soirée',
-      extraLabel: 'Extra',
+      extraLabel: 'Activité',
+      relaxMorning: 'Détente à l\'hôtel (soirée tardive)',
       prevMonth: '◀',
       nextMonth: '▶'
     },
@@ -204,11 +210,13 @@ export default function HomePage() {
       filterVenue: 'Filtrar por lugar',
       all: 'Todos',
       dayNames: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
-      morningLabel: 'Mañana/Tarde',
+      morningLabel: 'Mañana',
+      afternoonLabel: 'Tarde',
       lunchLabel: 'Almuerzo',
       dinnerLabel: 'Cena',
       eveningLabel: 'Noche',
-      extraLabel: 'Extra',
+      extraLabel: 'Actividad',
+      relaxMorning: 'Relajación en el hotel (noche anterior tarde)',
       prevMonth: '◀',
       nextMonth: '▶'
     }
@@ -308,30 +316,67 @@ export default function HomePage() {
       });
     }
 
+    // Array per tenere traccia se il giorno prima c'è stato un evento notturno
+    let prevDayLateNight = false;
     let itinerary = '';
+    
     for (let i = 0; i < days; i++) {
       const currentDate = new Date(startDate);
       currentDate.setDate(startDate.getDate() + i);
       const dayOfWeek = t.dayNames[currentDate.getDay()];
-      // Data formattata in base alla lingua
       const localizedDate = currentDate.toLocaleDateString(lang, {
         day: 'numeric',
         month: 'long',
         year: 'numeric'
       });
-      const formattedDateISO = currentDate.toISOString().slice(0,10); // per filtri
-      const dayEvents = musicEvents.filter(ev => ev.date === formattedDateISO);
+      const formattedDateISO = currentDate.toISOString().slice(0,10);
       
+      // Evento serale del giorno corrente
+      const dayEvents = musicEvents.filter(ev => ev.date === formattedDateISO);
       let musicSuggestion;
+      let isLateNight = false;
       if (dayEvents.length > 0) {
         musicSuggestion = `${dayEvents[0].name} @ ${dayEvents[0].venue}`;
+        isLateNight = true; // evento night club = tardi
       } else if (musicEvents.length > 0) {
         const fallbackEvent = musicEvents[i % musicEvents.length];
         musicSuggestion = `${fallbackEvent.name} @ ${fallbackEvent.venue}`;
+        isLateNight = true;
       } else {
         musicSuggestion = 'Serata libera';
+        isLateNight = false;
       }
       
+      // Mattina: se ieri sera c'è stato tardi -> relax, altrimenti spiaggia
+      let morningActivity;
+      if (prevDayLateNight) {
+        morningActivity = t.relaxMorning;
+      } else {
+        const availableBeaches = beachesList;
+        morningActivity = availableBeaches.length > 0 ? availableBeaches[i % availableBeaches.length].name : 'Spiaggia libera';
+      }
+      
+      // Pomeriggio: extra (se budget non budget) + spiaggia (se non relax già usata)
+      let afternoonActivity = '';
+      let extraLine = '';
+      if (budgetLevel !== 'budget' && extrasList.length > 0) {
+        const selectedExtra = extrasList[i % extrasList.length];
+        let extraText = selectedExtra.name;
+        const req = [];
+        if (selectedExtra.minPersons) req.push(`min. ${selectedExtra.minPersons} ${lang === 'it' ? 'persone' : 'people'}`);
+        if (selectedExtra.maxPersons) req.push(`max. ${selectedExtra.maxPersons} ${lang === 'it' ? 'persone' : 'people'}`);
+        if (req.length) extraText += ` (${req.join(', ')})`;
+        extraLine = `   ⚡ ${t.extraLabel}: ${extraText}\n`;
+      }
+      // Pomeriggio: se non abbiamo già usato la spiaggia la mattina (cioè non relax), altrimenti pomeriggio ancora relax?
+      if (prevDayLateNight) {
+        afternoonActivity = 'Spiaggia pubblica (dopo riposo)';
+      } else {
+        const availableBeaches = beachesList;
+        afternoonActivity = availableBeaches.length > 1 ? availableBeaches[(i+1) % availableBeaches.length].name : (availableBeaches.length > 0 ? availableBeaches[0].name : 'Spiaggia libera');
+      }
+      
+      // Pasti
       const availableRestaurants = restaurantsList;
       let lunchRestaurant, dinnerRestaurant;
       if (availableRestaurants.length === 0) {
@@ -348,29 +393,15 @@ export default function HomePage() {
         dinnerRestaurant = shuffled[1].name;
       }
       
-      const availableBeaches = beachesList;
-      const beachSuggestion = availableBeaches.length > 0 ? availableBeaches[i % availableBeaches.length].name : 'Spiaggia libera';
-      
-      let extraLine = '';
-      if (budgetLevel !== 'budget' && extrasList.length > 0) {
-        const selectedExtra = extrasList[i % extrasList.length];
-        let extraText = selectedExtra.name;
-        const req = [];
-        if (selectedExtra.minPersons) req.push(`min. ${selectedExtra.minPersons} persone`);
-        if (selectedExtra.maxPersons) req.push(`max. ${selectedExtra.maxPersons} persone`);
-        if (req.length) extraText += ` (${req.join(', ')})`;
-        extraLine = `\n   ⚡ ${t.extraLabel}: ${extraText}`;
-      } else if (budgetLevel !== 'budget' && extrasList.length === 0) {
-        extraLine = `\n   ⚡ ${t.extraLabel}: Relax in hotel`;
-      }
-      
       itinerary += `\n📅 ${dayOfWeek} ${localizedDate}\n`;
-      itinerary += `   ☀️ ${t.morningLabel}: ${beachSuggestion}\n`;
+      itinerary += `   🌅 ${t.morningLabel}: ${morningActivity}\n`;
+      if (extraLine) itinerary += extraLine;
+      itinerary += `   🏖️ ${t.afternoonLabel}: ${afternoonActivity}\n`;
       itinerary += `   🍽️ ${t.lunchLabel}: ${lunchRestaurant}\n`;
       itinerary += `   🍽️ ${t.dinnerLabel}: ${dinnerRestaurant}\n`;
-      itinerary += `   🎧 ${t.eveningLabel}: ${musicSuggestion}`;
-      itinerary += extraLine;
-      itinerary += `\n`;
+      itinerary += `   🎧 ${t.eveningLabel}: ${musicSuggestion}\n`;
+      
+      prevDayLateNight = isLateNight;
     }
     
     const msg = `🏝️ MYKONOS PLANNING 🏝️\n━━━━━━━━━━━━━━━━━━\n👤 ${t.name}: ${formData.name}\n👥 ${t.group}: ${groupNum}\n📅 ${t.arrival}: ${formData.arrivalDate}\n⏱️ ${t.days}: ${days}\n💰 ${t.budgetLabel}: ${formData.budget === 'luxury' ? 'Luxury' : formData.budget === 'mid' ? 'Mid Range' : 'Budget'}\n${itinerary}`;
