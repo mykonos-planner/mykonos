@@ -276,7 +276,7 @@ export default function HomePage() {
     });
 
     let musicEvents = eventsInRange.filter(ev => ev.category === 'Night Club' || ev.type === 'event');
-    let restaurantsList = events.filter(ev => ev.type === 'restaurant');
+    let allRestaurants = events.filter(ev => ev.type === 'restaurant');
     let beachesList = events.filter(ev => ev.type === 'beach');
     let extrasList = events.filter(ev => ev.type === 'extra' && ev.serviceType !== 'scooter' && ev.serviceType !== 'car');
 
@@ -291,7 +291,7 @@ export default function HomePage() {
       }
     };
 
-    restaurantsList = restaurantsList.filter(filterByBudget);
+    allRestaurants = allRestaurants.filter(filterByBudget);
     beachesList = beachesList.filter(filterByBudget);
     extrasList = extrasList.filter(filterByBudget);
     extrasList = extrasList.filter(extra => {
@@ -302,14 +302,16 @@ export default function HomePage() {
       return true;
     });
 
-    // Eventi musicali con fallback per luxury
+    // Escludi i dinner show (es. Carosello) dal pranzo
+    const lunchCandidates = allRestaurants.filter(r => !r.name.toLowerCase().includes('dinner show'));
+    const dinnerCandidates = allRestaurants;
+
     let filteredMusicEvents = musicEvents.filter(filterByBudget);
     if (budgetLevel === 'luxury' && filteredMusicEvents.length === 0) {
       filteredMusicEvents = musicEvents.filter(ev => !ev.budget || ev.budget === 'luxury' || ev.budget === 'mid');
     }
     musicEvents = filteredMusicEvents;
 
-    // Attività per mattina/pomeriggio: spiagge + extra (solo se non budget)
     let activitiesList = [...beachesList];
     if (budgetLevel !== 'budget') {
       activitiesList = [...activitiesList, ...extrasList];
@@ -328,7 +330,6 @@ export default function HomePage() {
       const localizedDate = currentDate.toLocaleDateString(lang, { day: 'numeric', month: 'long', year: 'numeric' });
       const formattedDateISO = currentDate.toISOString().slice(0,10);
 
-      // Serata
       const dayEvents = musicEvents.filter(ev => ev.date === formattedDateISO);
       let musicSuggestion;
       if (dayEvents.length > 0) {
@@ -342,7 +343,6 @@ export default function HomePage() {
 
       const isLateNight = !musicSuggestion.includes('Serata libera');
 
-      // Mattina: se la sera prima è stata lunga, relax o spiaggia gratuita
       let morningActivity;
       if (previousLateNight) {
         const freeBeaches = beachesList.filter(b => !b.budget || b.budget === 'budget');
@@ -355,7 +355,6 @@ export default function HomePage() {
         morningActivity = activitiesList.length > 0 ? activitiesList[i % activitiesList.length].name : 'Relax';
       }
 
-      // Pomeriggio: un'attività diversa dalla mattina (se possibile)
       let afternoonActivity;
       if (activitiesList.length > 1) {
         let idx = (i + Math.floor(activitiesList.length / 2)) % activitiesList.length;
@@ -366,21 +365,20 @@ export default function HomePage() {
         afternoonActivity = 'Relax';
       }
 
-      // Ristoranti
-      const availableRestaurants = restaurantsList;
       let lunchRestaurant, dinnerRestaurant;
-      if (availableRestaurants.length === 0) {
-        lunchRestaurant = dinnerRestaurant = 'Taverna locale';
-      } else if (availableRestaurants.length === 1) {
-        lunchRestaurant = dinnerRestaurant = availableRestaurants[0].name;
+      if (lunchCandidates.length === 0) {
+        lunchRestaurant = 'Taverna locale';
       } else {
-        const shuffled = [...availableRestaurants];
-        for (let j = shuffled.length - 1; j > 0; j--) {
-          const rand = Math.floor(Math.random() * (j + 1));
-          [shuffled[j], shuffled[rand]] = [shuffled[rand], shuffled[j]];
+        lunchRestaurant = lunchCandidates[i % lunchCandidates.length].name;
+      }
+      if (dinnerCandidates.length === 0) {
+        dinnerRestaurant = 'Taverna locale';
+      } else {
+        let dinnerIndex = i % dinnerCandidates.length;
+        if (dinnerCandidates.length > 1 && dinnerCandidates[dinnerIndex].name === lunchRestaurant) {
+          dinnerIndex = (dinnerIndex + 1) % dinnerCandidates.length;
         }
-        lunchRestaurant = shuffled[0].name;
-        dinnerRestaurant = shuffled[1].name;
+        dinnerRestaurant = dinnerCandidates[dinnerIndex].name;
       }
 
       itinerary += `\n📅 ${dayOfWeek} ${localizedDate}\n`;
