@@ -1,9 +1,8 @@
 import { Redis } from '@upstash/redis';
 
-// Usa la variabile corretta per l'URL REST (https)
 const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN,
+  url: process.env.KV_URL,
+  token: process.env.KV_REST_API_TOKEN,
 });
 
 export async function GET() {
@@ -35,17 +34,28 @@ export async function POST(request) {
     }
     
     if (action === 'add') {
-      if (!event.date || !event.name) {
-        return Response.json({ error: 'Data e nome obbligatori' }, { status: 400 });
+      // Solo il nome è obbligatorio; la data può essere assente o null
+      if (!event.name) {
+        return Response.json({ error: 'Il nome è obbligatorio' }, { status: 400 });
       }
+      
+      // Costruisci l'oggetto mantenendo tutti i campi extra
       const newEvent = {
         id: Date.now().toString(),
-        date: event.date,
         name: event.name,
+        date: event.date || null,        // se non c'è data, metti null
         venue: event.venue || '',
-        category: event.category || 'Night Club',
-        budget: event.budget || 'mid'
+        category: event.category || 'Service',
+        budget: event.budget || 'mid',
+        // Conserva eventuali campi specifici (ristorante, extra, spiaggia)
+        ...(event.cuisine && { cuisine: event.cuisine }),
+        ...(event.priceRange && { priceRange: event.priceRange }),
+        ...(event.note && { note: event.note }),
+        ...(event.serviceType && { serviceType: event.serviceType }),
+        ...(event.location && { location: event.location }),
+        ...(event.type && { type: event.type }) // 'restaurant', 'extra', 'beach'
       };
+      
       await redis.rpush('events', JSON.stringify(newEvent));
       return Response.json({ success: true, event: newEvent });
     }
