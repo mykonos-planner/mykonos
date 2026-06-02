@@ -33,8 +33,13 @@ export default function HomePage() {
   }, []);
 
   const updateBodyTheme = (isDark) => {
-    document.body.style.backgroundColor = isDark ? '#0B131F' : '#FDFBF7';
-    document.body.style.color = isDark ? '#E6EDF5' : '#2C3E50';
+    if (isDark) {
+      document.body.style.backgroundColor = '#0B131F';
+      document.body.style.color = '#E6EDF5';
+    } else {
+      document.body.style.backgroundColor = '#EAF7FA';   // acqua limpida
+      document.body.style.color = '#3E4A5B';            // pietra
+    }
   };
 
   const toggleDark = () => {
@@ -297,8 +302,7 @@ export default function HomePage() {
     const msg = `🏝️ MYKONOS PLANNING 🏝️\n━━━━━━━━━━━━━━━━━━\n👤 ${t.name}: ${formData.name}\n👥 ${t.group}: ${formData.groupSize}\n📅 ${t.arrival}: ${formData.arrivalDate}\n⏱️ ${t.days}: ${days}\n💰 ${t.budgetLabel}: ${formData.budget === 'luxury' ? 'Luxury' : formData.budget === 'mid' ? 'Mid Range' : 'Budget'}\n${itinerary}`;
     setGeneratedMsg(msg);
   };
-
-  const servicesData = {
+    const servicesData = {
     beachClubs: ['Scorpios', 'Nammos', 'Principote', 'SantAnna', 'Kalua', 'Anios', 'Super Paradise', 'Tropicana'],
     nightClubs: ['Cavo Paradiso', 'Alemagou', 'Interni', 'Void', 'Monastery'],
     restaurants: ['Carosello (Dinner Show)', 'Cavotagoo Chef\'s Table', 'Interni Restaurant', 'Thalas', 'Ling Ling'],
@@ -315,8 +319,8 @@ export default function HomePage() {
   const lightSecondary = '#4A90E2';
   const lightBgCard = '#FFFFFF';
   const lightBgAlt = '#F8F9FA';
-  const lightText = '#2C3E50';
-  const lightTextMuted = '#5D6D7E';
+  const lightText = '#3E4A5B';
+  const lightTextMuted = '#6B7B8D';
 
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '20px' }}>
@@ -486,7 +490,7 @@ const inputStyle = (darkMode, hasError, primaryColor) => ({
   width: '100%', padding: '12px', borderRadius: '48px',
   border: hasError ? '2px solid #E03B7B' : `1px solid ${darkMode ? '#38A1F3' : primaryColor}`,
   background: darkMode ? '#0B131F' : '#FFFFFF',
-  color: darkMode ? '#E6EDF5' : '#2C3E50',
+  color: darkMode ? '#E6EDF5' : '#3E4A5B',
   fontSize: '1rem', boxSizing: 'border-box'
 });
 
@@ -494,6 +498,6 @@ const selectStyle = (darkMode, hasError, primaryColor) => ({
   width: '100%', padding: '12px', borderRadius: '48px',
   border: hasError ? '2px solid #E03B7B' : `1px solid ${darkMode ? '#38A1F3' : primaryColor}`,
   background: darkMode ? '#0B131F' : '#FFFFFF',
-  color: darkMode ? '#E6EDF5' : '#2C3E50',
+  color: darkMode ? '#E6EDF5' : '#3E4A5B',
   fontSize: '1rem', boxSizing: 'border-box'
 });
