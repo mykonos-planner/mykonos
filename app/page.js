@@ -75,6 +75,7 @@ export default function HomePage() {
     }
   };
 
+  // Traduzioni (invariate)
   const translations = {
     it: {
       explore: '📅 Eventi',
@@ -103,7 +104,8 @@ export default function HomePage() {
       all: 'Tutti',
       dayNames: ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato'],
       morningLabel: 'Mattina/Pomeriggio',
-      mealLabel: 'Pranzo/Cena',
+      lunchLabel: 'Pranzo',
+      dinnerLabel: 'Cena',
       eveningLabel: 'Serata',
       extraLabel: 'Extra',
       prevMonth: '◀',
@@ -136,7 +138,8 @@ export default function HomePage() {
       all: 'All',
       dayNames: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
       morningLabel: 'Morning/Afternoon',
-      mealLabel: 'Lunch/Dinner',
+      lunchLabel: 'Lunch',
+      dinnerLabel: 'Dinner',
       eveningLabel: 'Evening',
       extraLabel: 'Extra',
       prevMonth: '◀',
@@ -169,7 +172,8 @@ export default function HomePage() {
       all: 'Tous',
       dayNames: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],
       morningLabel: 'Matin/Après-midi',
-      mealLabel: 'Déjeuner/Dîner',
+      lunchLabel: 'Déjeuner',
+      dinnerLabel: 'Dîner',
       eveningLabel: 'Soirée',
       extraLabel: 'Extra',
       prevMonth: '◀',
@@ -202,7 +206,8 @@ export default function HomePage() {
       all: 'Todos',
       dayNames: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
       morningLabel: 'Mañana/Tarde',
-      mealLabel: 'Comida/Cena',
+      lunchLabel: 'Almuerzo',
+      dinnerLabel: 'Cena',
       eveningLabel: 'Noche',
       extraLabel: 'Extra',
       prevMonth: '◀',
@@ -237,6 +242,14 @@ export default function HomePage() {
 
   const uniqueVenues = [...new Set(validEvents.map(ev => ev.venue).filter(Boolean))];
 
+  // Mappa colori per venue (consistente in light/dark)
+  const venueColors = {};
+  const colorPalette = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8', '#F7B787', '#B5EAD7', '#C7CEE6', '#FFB347', '#AEC6CF'];
+  uniqueVenues.forEach((venue, idx) => {
+    venueColors[venue] = colorPalette[idx % colorPalette.length];
+  });
+  const defaultColor = '#AAAAAA';
+
   const validateForm = () => {
     let err = {};
     if (!formData.name.trim()) err.name = true;
@@ -263,9 +276,12 @@ export default function HomePage() {
     });
 
     const musicEvents = eventsInRange.filter(ev => ev.category === 'Night Club' || ev.type === 'event');
-    const restaurantsList = events.filter(ev => ev.type === 'restaurant');
-    const beachesList = events.filter(ev => ev.type === 'beach');
-    const extrasList = events.filter(ev => ev.type === 'extra');
+    // Ristoranti: tutti quelli con type restaurant
+    let restaurantsList = events.filter(ev => ev.type === 'restaurant');
+    // Spiagge
+    let beachesList = events.filter(ev => ev.type === 'beach');
+    // Extra: escludi scooter e car rental
+    let extrasList = events.filter(ev => ev.type === 'extra' && ev.serviceType !== 'scooter' && ev.serviceType !== 'car');
 
     const filterByBudget = (item) => {
       if (!item.budget) return true;
@@ -283,8 +299,23 @@ export default function HomePage() {
       const dayEvents = musicEvents.filter(ev => ev.date === formattedDate);
       const musicSuggestion = dayEvents.length > 0 ? dayEvents[0].name : (musicEvents.length > 0 ? musicEvents[i % musicEvents.length].name : 'Serata libera');
       
+      // Seleziona ristoranti filtrabili
       const availableRestaurants = restaurantsList.filter(filterByBudget);
-      const restaurantSuggestion = availableRestaurants.length > 0 ? availableRestaurants[i % availableRestaurants.length].name : 'Taverna locale';
+      // Per pranzo e cena prendiamo due ristoranti diversi (se possibile)
+      let lunchRestaurant, dinnerRestaurant;
+      if (availableRestaurants.length === 0) {
+        lunchRestaurant = dinnerRestaurant = 'Taverna locale';
+      } else if (availableRestaurants.length === 1) {
+        lunchRestaurant = dinnerRestaurant = availableRestaurants[0].name;
+      } else {
+        const shuffled = [...availableRestaurants];
+        for (let j = shuffled.length - 1; j > 0; j--) {
+          const rand = Math.floor(Math.random() * (j + 1));
+          [shuffled[j], shuffled[rand]] = [shuffled[rand], shuffled[j]];
+        }
+        lunchRestaurant = shuffled[0].name;
+        dinnerRestaurant = shuffled[1].name;
+      }
       
       const availableBeaches = beachesList.filter(filterByBudget);
       const beachSuggestion = availableBeaches.length > 0 ? availableBeaches[i % availableBeaches.length].name : 'Spiaggia libera';
@@ -294,7 +325,8 @@ export default function HomePage() {
       
       itinerary += `\n📅 ${dayOfWeek} ${formattedDate}\n`;
       itinerary += `   ☀️ ${t.morningLabel}: ${beachSuggestion}\n`;
-      itinerary += `   🍽️ ${t.mealLabel}: ${restaurantSuggestion}\n`;
+      itinerary += `   🍽️ ${t.lunchLabel}: ${lunchRestaurant}\n`;
+      itinerary += `   🍽️ ${t.dinnerLabel}: ${dinnerRestaurant}\n`;
       itinerary += `   🎧 ${t.eveningLabel}: ${musicSuggestion}\n`;
       itinerary += `   ⚡ ${t.extraLabel}: ${extraSuggestion}\n`;
     }
@@ -307,7 +339,7 @@ export default function HomePage() {
     beachClubs: ['Scorpios', 'Nammos', 'Principote', 'SantAnna', 'Kalua', 'Anios', 'Super Paradise', 'Tropicana'],
     nightClubs: ['Cavo Paradiso', 'Alemagou', 'Interni', 'Void', 'Monastery'],
     restaurants: ['Carosello (Dinner Show)', 'Cavotagoo Chef\'s Table', 'Interni Restaurant', 'Thalas', 'Ling Ling'],
-    extras: ['Jetski', 'Flyboard', 'Parasailing', 'Boat rental (RIB)', 'Private cruise', 'ATV/Quad', 'Scooter rental', 'Car rental', 'Water taxi']
+    extras: ['Jetski', 'Flyboard', 'Parasailing', 'Boat rental (RIB)', 'Private cruise', 'ATV/Quad', 'Water taxi', 'Mykonos Boat Party']
   };
 
   const transitionStyle = {
@@ -401,12 +433,26 @@ export default function HomePage() {
                 return (
                   <div key={day} style={{ marginBottom: '24px', borderBottom: `1px solid ${darkMode ? '#334155' : '#e2e8f0'}`, paddingBottom: '16px' }}>
                     <h3 style={{ fontSize: '1.2rem', color: darkMode ? '#E6EDF5' : lightText, marginBottom: '12px' }}>{dayName} {day} {monthNames[lang][currentMonth]}</h3>
-                    {dayEvents.map(ev => (
-                      <div key={ev.id} style={{ background: darkMode ? '#0B131F' : lightBgAlt, borderRadius: '16px', padding: '12px', marginBottom: '10px', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <div><strong>{ev.name}</strong> @ {ev.venue}</div>
-                        <div style={{ background: darkMode ? `${accentOrange}20` : `${lightSecondary}20`, padding: '4px 12px', borderRadius: '20px', fontSize: '0.75rem', color: darkMode ? accentOrange : lightSecondary }}>{t.categories[ev.category] || ev.category}</div>
-                      </div>
-                    ))}
+                    {dayEvents.map(ev => {
+                      const venueColor = venueColors[ev.venue] || defaultColor;
+                      return (
+                        <div key={ev.id} style={{
+                          background: darkMode ? '#0B131F' : lightBgAlt,
+                          borderRadius: '16px',
+                          padding: '12px',
+                          marginBottom: '10px',
+                          display: 'flex',
+                          flexWrap: 'wrap',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          borderLeft: `4px solid ${venueColor}`,
+                          boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+                        }}>
+                          <div><strong style={{ color: venueColor }}>{ev.name}</strong> @ {ev.venue}</div>
+                          <div style={{ background: darkMode ? `${accentOrange}20` : `${lightSecondary}20`, padding: '4px 12px', borderRadius: '20px', fontSize: '0.75rem', color: darkMode ? accentOrange : lightSecondary }}>{t.categories[ev.category] || ev.category}</div>
+                        </div>
+                      );
+                    })}
                   </div>
                 );
               });
