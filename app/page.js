@@ -620,7 +620,9 @@ const inputStyle = (darkMode, hasError, primaryColor, isMobile) => ({
   color: darkMode ? '#E6EDF5' : '#3E4A5B',
   fontSize: isMobile ? '0.9rem' : '1rem',
   boxSizing: 'border-box',
-  display: 'block'
+  display: 'block',
+  minHeight: isMobile ? '44px' : '52px',
+  lineHeight: 'normal'
 });
 
 const selectStyle = (darkMode, hasError, primaryColor, isMobile) => ({
@@ -631,5 +633,6 @@ const selectStyle = (darkMode, hasError, primaryColor, isMobile) => ({
   background: darkMode ? '#0B131F' : '#FFFFFF',
   color: darkMode ? '#E6EDF5' : '#3E4A5B',
   fontSize: isMobile ? '0.9rem' : '1rem',
-  boxSizing: 'border-box'
+  boxSizing: 'border-box',
+  minHeight: isMobile ? '44px' : '52px'
 });
