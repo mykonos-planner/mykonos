@@ -132,7 +132,8 @@ export default function HomePage() {
       mapTitle: '🗺️ Mappa interattiva',
       beachClubLabel: 'Beach Club',
       restaurantLabel: 'Ristorante',
-      nightClubLabel: 'Night Club'
+      nightClubLabel: 'Night Club',
+      searchPlaceholder: 'Cerca un locale...'
     },
     en: {
       explore: '📅 Events',
@@ -170,7 +171,8 @@ export default function HomePage() {
       mapTitle: '🗺️ Interactive Map',
       beachClubLabel: 'Beach Club',
       restaurantLabel: 'Restaurant',
-      nightClubLabel: 'Night Club'
+      nightClubLabel: 'Night Club',
+      searchPlaceholder: 'Search a place...'
     },
     fr: {
       explore: '📅 Événements',
@@ -208,7 +210,8 @@ export default function HomePage() {
       mapTitle: '🗺️ Carte interactive',
       beachClubLabel: 'Club de plage',
       restaurantLabel: 'Restaurant',
-      nightClubLabel: 'Club de nuit'
+      nightClubLabel: 'Club de nuit',
+      searchPlaceholder: 'Rechercher un lieu...'
     },
     es: {
       explore: '📅 Eventos',
@@ -246,7 +249,8 @@ export default function HomePage() {
       mapTitle: '🗺️ Mapa interactivo',
       beachClubLabel: 'Club de playa',
       restaurantLabel: 'Restaurante',
-      nightClubLabel: 'Discoteca'
+      nightClubLabel: 'Discoteca',
+      searchPlaceholder: 'Buscar un lugar...'
     }
   };
   const t = translations[lang] || translations.it;
@@ -433,8 +437,8 @@ export default function HomePage() {
 
   const servicesData = {
     beachClubs: ['Kalua', 'SantAnna', 'Tropicana', 'Scorpios', 'Alemagou', 'Nammos', 'Principote', 'Super Paradise', 'Anios', 'Branco', 'Thalas'],
-    nightClubs: ['Toy Room Mykonos', 'Semeli', 'We❤️Myk', 'Void', 'Bombonierre', 'Queen', 'Tabù', 'Cavo Paradiso', 'Tape'],
-    restaurants: ['Lìo', 'Interni', 'Mediterraneo', 'Zuma Mykonos', 'Cavo Tagoo', 'Spilia', 'Carosello', 'Orama', 'Cantera'],
+    nightClubs: ['Toy Room Mykonos', 'Semeli The Bar', 'We❤️Myk', 'Void', 'Bombonierre', 'Queen of Mykonos', 'Tabu', 'Cavo Paradiso', 'Tape'],
+    restaurants: ['Lío', 'Interni', 'Mediterraneo', 'Zuma Mykonos', 'Cavo Tagoo', 'Spilia', 'Carosello', 'Orama', 'Cantera'],
     extras: ['Jetski', 'Rental Boat', 'Rental Yatch', 'Boat party', 'Rental Car', 'Rental Scooter', 'Rental ATV']
   };
 
@@ -723,12 +727,12 @@ export default function HomePage() {
                     {servicesData.nightClubs.map(c => {
                       const coords = (() => {
                         if (c === 'Toy Room Mykonos') return [37.445694, 25.326497];
-                        if (c === 'Semeli') return [37.445697, 25.326511];
+                        if (c === 'Semeli The Bar') return [37.445697, 25.326511];
                         if (c === 'We❤️Myk') return [37.447578, 25.329436];
                         if (c === 'Void') return [37.444306, 25.328611];
                         if (c === 'Bombonierre') return [37.444981, 25.328100];
-                        if (c === 'Queen') return [37.445203, 25.328308];
-                        if (c === 'Tabù') return [37.447200, 25.328306];
+                        if (c === 'Queen of Mykonos') return [37.445203, 25.328308];
+                        if (c === 'Tabu') return [37.447200, 25.328306];
                         if (c === 'Cavo Paradiso') return [37.408081, 25.360436];
                         if (c === 'Tape') return [37.447842, 25.329428];
                         return null;
@@ -746,7 +750,7 @@ export default function HomePage() {
                   <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                     {servicesData.restaurants.map(c => {
                       const coords = (() => {
-                        if (c === 'Lìo') return [37.444994, 25.328236];
+                        if (c === 'Lío') return [37.444994, 25.328236];
                         if (c === 'Interni') return [37.445589, 25.328708];
                         if (c === 'Mediterraneo') return [37.445592, 25.328706];
                         if (c === 'Zuma Mykonos') return [37.458539, 25.329533];
