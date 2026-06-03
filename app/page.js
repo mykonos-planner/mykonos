@@ -128,7 +128,11 @@ export default function HomePage() {
       dinnerLabel: 'Cena',
       eveningLabel: 'Serata',
       prevMonth: '◀',
-      nextMonth: '▶'
+      nextMonth: '▶',
+      mapTitle: '🗺️ Mappa interattiva',
+      beachClubLabel: 'Beach Club',
+      restaurantLabel: 'Ristorante',
+      nightClubLabel: 'Night Club'
     },
     en: {
       explore: '📅 Events',
@@ -162,7 +166,11 @@ export default function HomePage() {
       dinnerLabel: 'Dinner',
       eveningLabel: 'Evening',
       prevMonth: '◀',
-      nextMonth: '▶'
+      nextMonth: '▶',
+      mapTitle: '🗺️ Interactive Map',
+      beachClubLabel: 'Beach Club',
+      restaurantLabel: 'Restaurant',
+      nightClubLabel: 'Night Club'
     },
     fr: {
       explore: '📅 Événements',
@@ -196,7 +204,11 @@ export default function HomePage() {
       dinnerLabel: 'Dîner',
       eveningLabel: 'Soirée',
       prevMonth: '◀',
-      nextMonth: '▶'
+      nextMonth: '▶',
+      mapTitle: '🗺️ Carte interactive',
+      beachClubLabel: 'Club de plage',
+      restaurantLabel: 'Restaurant',
+      nightClubLabel: 'Club de nuit'
     },
     es: {
       explore: '📅 Eventos',
@@ -230,7 +242,11 @@ export default function HomePage() {
       dinnerLabel: 'Cena',
       eveningLabel: 'Noche',
       prevMonth: '◀',
-      nextMonth: '▶'
+      nextMonth: '▶',
+      mapTitle: '🗺️ Mapa interactivo',
+      beachClubLabel: 'Club de playa',
+      restaurantLabel: 'Restaurante',
+      nightClubLabel: 'Discoteca'
     }
   };
   const t = translations[lang] || translations.it;
@@ -668,8 +684,8 @@ export default function HomePage() {
             <h2 style={{ color: darkMode ? '#E6EDF5' : lightText, fontSize: isMobile ? '1.4rem' : '1.8rem', marginBottom: '24px' }}>🏛️ {lang === 'it' ? 'Scopri Mykonos' : lang === 'en' ? 'Discover Mykonos' : lang === 'fr' ? 'Découvrez Mykonos' : 'Descubre Mykonos'}</h2>
             
             <div style={{ marginBottom: '40px' }}>
-              <h3 style={{ color: darkMode ? accentBlue : lightPrimary, marginBottom: '12px', fontSize: isMobile ? '1.2rem' : '1.3rem' }}>🗺️ Mappa interattiva</h3>
-              <Map ref={mapRef} darkMode={darkMode} isMobile={isMobile} />
+              <h3 style={{ color: darkMode ? accentBlue : lightPrimary, marginBottom: '12px', fontSize: isMobile ? '1.2rem' : '1.3rem' }}>{t.mapTitle}</h3>
+              <Map ref={mapRef} darkMode={darkMode} isMobile={isMobile} t={t} />
             </div>
             
             <div>
@@ -680,17 +696,17 @@ export default function HomePage() {
                   <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                     {servicesData.beachClubs.map(c => {
                       const coords = (() => {
-                        if (c === 'Kalua') return [37.424, 25.344];
-                        if (c === 'SantAnna') return [37.4245, 25.3445];
-                        if (c === 'Tropicana') return [37.424, 25.356];
-                        if (c === 'Scorpios') return [37.4235, 25.344];
-                        if (c === 'Alemagou') return [37.4651, 25.3515];
-                        if (c === 'Nammos') return [37.41558, 25.33694];
-                        if (c === 'Principote') return [37.47679, 25.35983];
-                        if (c === 'Super Paradise') return [37.41622, 25.36857];
-                        if (c === 'Anios') return [37.419, 25.351];
-                        if (c === 'Branco') return [37.41395, 25.34503];
-                        if (c === 'Thalas') return [37.44246, 25.42302];
+                        if (c === 'Kalua') return [37.408069, 25.349664];
+                        if (c === 'SantAnna') return [37.408450, 25.348914];
+                        if (c === 'Tropicana') return [37.410286, 25.356731];
+                        if (c === 'Scorpios') return [37.407244, 25.347631];
+                        if (c === 'Alemagou') return [37.464667, 25.380850];
+                        if (c === 'Nammos') return [37.415597, 25.337111];
+                        if (c === 'Principote') return [37.476622, 25.359892];
+                        if (c === 'Super Paradise') return [37.415503, 25.369467];
+                        if (c === 'Anios') return [37.414403, 25.344194];
+                        if (c === 'Branco') return [37.414025, 25.345183];
+                        if (c === 'Thalas') return [37.415119, 25.368308];
                         return null;
                       })();
                       return (
@@ -706,15 +722,15 @@ export default function HomePage() {
                   <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                     {servicesData.nightClubs.map(c => {
                       const coords = (() => {
-                        if (c === 'Toy Room Mykonos') return [37.445, 25.33];
-                        if (c === 'Semeli') return [37.44395, 25.33007];
-                        if (c === 'We❤️Myk') return [37.445, 25.33];
-                        if (c === 'Void') return [37.4445, 25.3278];
-                        if (c === 'Bombonierre') return [37.445, 25.33];
-                        if (c === 'Queen') return [37.445, 25.33];
-                        if (c === 'Tabù') return [37.445, 25.33];
-                        if (c === 'Cavo Paradiso') return [37.431, 25.377];
-                        if (c === 'Tape') return [37.445, 25.33];
+                        if (c === 'Toy Room Mykonos') return [37.445694, 25.326497];
+                        if (c === 'Semeli') return [37.445697, 25.326511];
+                        if (c === 'We❤️Myk') return [37.447578, 25.329436];
+                        if (c === 'Void') return [37.444306, 25.328611];
+                        if (c === 'Bombonierre') return [37.444981, 25.328100];
+                        if (c === 'Queen') return [37.445203, 25.328308];
+                        if (c === 'Tabù') return [37.447200, 25.328306];
+                        if (c === 'Cavo Paradiso') return [37.408081, 25.360436];
+                        if (c === 'Tape') return [37.447842, 25.329428];
                         return null;
                       })();
                       return (
@@ -730,15 +746,15 @@ export default function HomePage() {
                   <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                     {servicesData.restaurants.map(c => {
                       const coords = (() => {
-                        if (c === 'Lìo') return [37.444, 25.329];
-                        if (c === 'Interni') return [37.444, 25.329];
-                        if (c === 'Mediterraneo') return [37.444, 25.329];
-                        if (c === 'Zuma Mykonos') return [37.444, 25.329];
-                        if (c === 'Cavo Tagoo') return [37.4515, 25.32863];
-                        if (c === 'Spilia') return [37.43458, 25.41924];
-                        if (c === 'Carosello') return [37.444, 25.329];
-                        if (c === 'Orama') return [37.445, 25.33];
-                        if (c === 'Cantera') return [37.444, 25.329];
+                        if (c === 'Lìo') return [37.444994, 25.328236];
+                        if (c === 'Interni') return [37.445589, 25.328708];
+                        if (c === 'Mediterraneo') return [37.445592, 25.328706];
+                        if (c === 'Zuma Mykonos') return [37.458539, 25.329533];
+                        if (c === 'Cavo Tagoo') return [37.456669, 25.328942];
+                        if (c === 'Spilia') return [37.434731, 25.419383];
+                        if (c === 'Carosello') return [37.445, 25.328];
+                        if (c === 'Orama') return [37.425753, 25.326158];
+                        if (c === 'Cantera') return [37.445947, 25.326300];
                         return null;
                       })();
                       return (
