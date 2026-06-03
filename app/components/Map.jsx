@@ -113,42 +113,42 @@ const Map = forwardRef(({ darkMode, isMobile }, ref) => {
     }
   }), [mapInstance]);
 
-  // Coordinate aggiornate secondo la tabella fornita
+  // Coordinate convertite da gradi/minuti/secondi a decimali
   const locations = {
     beachClub: [
-      { name: "Kalua", coords: [37.4149, 25.3465], address: "Paraga Beach" },
-      { name: "SantAnna", coords: [37.4140, 25.3460], address: "Paraga Beach" },
-      { name: "Tropicana", coords: [37.4266, 25.3387], address: "Paradise Beach" },
-      { name: "Scorpios", coords: [37.4133, 25.3445], address: "Paraga Beach" },
-      { name: "Alemagou", coords: [37.4651, 25.3515], address: "Ftelia Beach" },
-      { name: "Nammos", coords: [37.4187, 25.3294], address: "Psarou Beach" },
-      { name: "Principote", coords: [37.4763258, 25.3597796], address: "Panormos Beach" },
-      { name: "Super Paradise", coords: [37.4203, 25.3620], address: "Super Paradise Beach" },
-      { name: "Anios", coords: [37.4137, 25.3219], address: "Platis Gialos" },
-      { name: "Branco", coords: [37.4138, 25.3215], address: "Platis Gialos" },
-      { name: "Thalassa", coords: [37.4134, 25.3211], address: "Platis Gialos" }
+      { name: "Kalua", coords: [37.408069, 25.349664], address: "Paraga Beach" },         // 37°24'29.05"N 25°20'58.79"E
+      { name: "SantAnna", coords: [37.408450, 25.348914], address: "Paraga Beach" },       // 37°24'30.42"N 25°20'56.09"E
+      { name: "Tropicana", coords: [37.410286, 25.356731], address: "Paradise Beach" },    // 37°24'37.03"N 25°21'24.23"E
+      { name: "Scorpios", coords: [37.407244, 25.347631], address: "Paraga Beach" },       // 37°24'24.88"N 25°20'51.47"E
+      { name: "Alemagou", coords: [37.464667, 25.380850], address: "Ftelia Beach" },       // 37°27'52.80"N 25°22'51.06"E
+      { name: "Nammos", coords: [37.415597, 25.337111], address: "Psarou Beach" },         // 37°24'56.15"N 25°20'13.60"E
+      { name: "Principote", coords: [37.476622, 25.359892], address: "Panormos Beach" },   // 37°28'35.84"N 25°21'35.61"E
+      { name: "Super Paradise", coords: [37.415503, 25.369467], address: "Super Paradise" },// 37°24'55.81"N 25°22'10.08"E
+      { name: "Anios", coords: [37.414403, 25.344194], address: "Platis Gialos" },         // 37°24'51.85"N 25°20'39.10"E
+      { name: "Branco", coords: [37.414025, 25.345183], address: "Platis Gialos" },        // 37°24'50.49"N 25°20'42.66"E
+      { name: "Thalas", coords: [37.415119, 25.368308], address: "Super Paradise" }        // 37°24'54.43"N 25°22'05.91"E
     ],
     restaurant: [
-      { name: "Lío", coords: [37.4475, 25.3284], address: "Enoplon Dinameon 6" },
-      { name: "Interni", coords: [37.4469, 25.3280], address: "Matogianni" },
-      { name: "Mediterraneo", coords: [37.4472, 25.3276], address: "Lakka Square" },
-      { name: "Zuma Mykonos", coords: [37.4543, 25.3237], address: "Cavo Tagoo Hotel" },
-      { name: "Cavo Tagoo", coords: [37.4543, 25.3237], address: "Tagoo Area" },
-      { name: "Spilia", coords: [37.4373, 25.4328], address: "Kalafati" },
-      { name: "Carosello", coords: [37.4468, 25.3280], address: "Mykonos Town" },
-      { name: "Orama", coords: [37.4500, 25.3265], address: "Old Port" },
-      { name: "Cantera", coords: [37.4462, 25.3254], address: "Little Venice" }
+      { name: "Lío", coords: [37.444994, 25.328236], address: "Enoplon Dinameon 6" },      // 37°26'41.98"N 25°19'41.65"E
+      { name: "Interni", coords: [37.445589, 25.328708], address: "Matogianni" },          // 37°26'44.12"N 25°19'43.35"E
+      { name: "Mediterraneo", coords: [37.445592, 25.328706], address: "Lakka Square" },   // 37°26'44.13"N 25°19'43.34"E
+      { name: "Zuma Mykonos", coords: [37.458539, 25.329533], address: "Cavo Tagoo Hotel" },// 37°27'30.74"N 25°19'46.32"E
+      { name: "Cavo Tagoo", coords: [37.456669, 25.328942], address: "Tagoo Area" },       // 37°27'24.01"N 25°19'44.19"E
+      { name: "Spilia", coords: [37.434731, 25.419383], address: "Kalafati" },             // 37°26'05.03"N 25°25'09.78"E
+      { name: "Carosello", coords: [37.445, 25.328], address: "Mykonos Town (centro)" },   // generico, mancante
+      { name: "Orama", coords: [37.425753, 25.326158], address: "Old Port" },              // 37°25'32.71"N 25°19'34.17"E
+      { name: "Cantera", coords: [37.445947, 25.326300], address: "Little Venice" }        // 37°26'45.41"N 25°19'34.68"E
     ],
     nightClub: [
-      { name: "Toy Room Mykonos", coords: [37.4460, 25.3250], address: "Little Venice" },
-      { name: "Semeli The Bar", coords: [37.4461, 25.3248], address: "Little Venice" },
-      { name: "We❤️Myk", coords: [37.4475, 25.3285], address: "Mykonos Town" },
-      { name: "Void", coords: [37.4471, 25.3278], address: "Lakka" },
-      { name: "Bombonierre", coords: [37.4474, 25.3282], address: "Mykonos Town" },
-      { name: "Queen of Mykonos", coords: [37.4476, 25.3283], address: "Enoplon Dinameon" },
-      { name: "Tabu", coords: [37.4470, 25.3277], address: "Mykonos Town" },
-      { name: "Cavo Paradiso", coords: [37.4246, 25.3419], address: "Paradise Beach" },
-      { name: "Tape", coords: [37.4473, 25.3281], address: "Mykonos Town" }
+      { name: "Toy Room Mykonos", coords: [37.445694, 25.326497], address: "Little Venice" },// 37°26'45.70"N 25°19'35.39"E
+      { name: "Semeli The Bar", coords: [37.445697, 25.326511], address: "Little Venice" }, // 37°26'45.71"N 25°19'35.44"E
+      { name: "We❤️Myk", coords: [37.447578, 25.329436], address: "Mykonos Town" },       // 37°26'51.28"N 25°19'45.97"E
+      { name: "Void", coords: [37.444306, 25.328611], address: "Lakka" },                  // 37°26'39.50"N 25°19'43.00"E
+      { name: "Bombonierre", coords: [37.444981, 25.328100], address: "Mykonos Town" },    // 37°26'41.93"N 25°19'41.16"E
+      { name: "Queen of Mykonos", coords: [37.445203, 25.328308], address: "Enoplon Dinameon" },// 37°26'42.73"N 25°19'41.91"E
+      { name: "Tabu", coords: [37.447200, 25.328306], address: "Mykonos Town" },           // 37°26'49.92"N 25°19'41.90"E
+      { name: "Cavo Paradiso", coords: [37.408081, 25.360436], address: "Paradise Beach" },// 37°24'29.09"N 25°21'37.57"E
+      { name: "Tape", coords: [37.447842, 25.329428], address: "Mykonos Town" }            // 37°26'52.23"N 25°19'45.94"E
     ]
   };
 
