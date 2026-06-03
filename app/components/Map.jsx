@@ -3,7 +3,6 @@ import { useEffect, useState, useImperativeHandle, forwardRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap, Tooltip } from 'react-leaflet';
 import L from 'leaflet';
 
-// Configurazione icone
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
@@ -40,37 +39,6 @@ function MapRefHandler({ setMap }) {
   return null;
 }
 
-// Componente che controlla lo zoom e mostra/nasconde i tooltip
-function TooltipController({ children, zoomThreshold = 14 }) {
-  const map = useMap();
-  const [showPermanent, setShowPermanent] = useState(false);
-  useEffect(() => {
-    const handleZoom = () => {
-      const zoom = map.getZoom();
-      setShowPermanent(zoom >= zoomThreshold);
-    };
-    map.on('zoomend', handleZoom);
-    handleZoom();
-    return () => {
-      map.off('zoomend', handleZoom);
-    };
-  }, [map]);
-  // Clona i children e aggiunge la prop `permanent` se necessario
-  return children.map(child => {
-    if (child.type === Marker) {
-      const newChildren = React.Children.map(child.props.children, subChild => {
-        if (subChild.type === Tooltip) {
-          return React.cloneElement(subChild, { permanent: showPermanent });
-        }
-        return subChild;
-      });
-      return React.cloneElement(child, {}, newChildren);
-    }
-    return child;
-  });
-}
-
-// Legenda orizzontale elegante (solo per mobile, per desktop resta verticale? No, unifico: su entrambi orizzontale in basso a sinistra)
 function Legend({ darkMode, isMobile }) {
   const legendStyle = {
     position: 'absolute',
@@ -145,42 +113,42 @@ const Map = forwardRef(({ darkMode, isMobile }, ref) => {
     }
   }), [mapInstance]);
 
-  // Coordinate verificate e aggiornate
+  // Coordinate aggiornate secondo la tabella fornita
   const locations = {
     beachClub: [
-      { name: "Kalua", coords: [37.424, 25.344], address: "Paraga Beach" },
-      { name: "SantAnna", coords: [37.4245, 25.3445], address: "Paraga Beach" },
-      { name: "Tropicana", coords: [37.424, 25.356], address: "Paradise Beach" },
-      { name: "Scorpios", coords: [37.4235, 25.344], address: "Paraga Beach" },
+      { name: "Kalua", coords: [37.4149, 25.3465], address: "Paraga Beach" },
+      { name: "SantAnna", coords: [37.4140, 25.3460], address: "Paraga Beach" },
+      { name: "Tropicana", coords: [37.4266, 25.3387], address: "Paradise Beach" },
+      { name: "Scorpios", coords: [37.4133, 25.3445], address: "Paraga Beach" },
       { name: "Alemagou", coords: [37.4651, 25.3515], address: "Ftelia Beach" },
-      { name: "Nammos", coords: [37.41558, 25.33694], address: "Psarou Beach" },
-      { name: "Principote", coords: [37.47679, 25.35983], address: "Panormos Beach" },
-      { name: "Super Paradise", coords: [37.41622, 25.36857], address: "Super Paradise Beach" },
-      { name: "Anios", coords: [37.419, 25.351], address: "Platis Gialos" },
-      { name: "Branco", coords: [37.41395, 25.34503], address: "Platis Gialos" },
-      { name: "Thalas", coords: [37.44246, 25.42302], address: "Super Paradise Beach" }
+      { name: "Nammos", coords: [37.4187, 25.3294], address: "Psarou Beach" },
+      { name: "Principote", coords: [37.4763258, 25.3597796], address: "Panormos Beach" },
+      { name: "Super Paradise", coords: [37.4203, 25.3620], address: "Super Paradise Beach" },
+      { name: "Anios", coords: [37.4137, 25.3219], address: "Platis Gialos" },
+      { name: "Branco", coords: [37.4138, 25.3215], address: "Platis Gialos" },
+      { name: "Thalassa", coords: [37.4134, 25.3211], address: "Platis Gialos" }
     ],
     restaurant: [
-      { name: "Lio", coords: [37.444, 25.329], address: "Enoplon Dinameon 6, Mykonos Town" },
-      { name: "Interni", coords: [37.444, 25.329], address: "Matogianni Street, Mykonos Town" },
-      { name: "Mediterraneo", coords: [37.444, 25.329], address: "Mykonos Town" },
-      { name: "Zuma Mykonos", coords: [37.4515, 25.32863], address: "Cavo Tagoo Hotel" },
-      { name: "Cavo Tagoo", coords: [37.4515, 25.32863], address: "Tagoo Area" },
-      { name: "Spilia", coords: [37.43458, 25.41924], address: "Agrari Beach" },
-      { name: "Carosello", coords: [37.444, 25.329], address: "Mykonos Town" },
-      { name: "Orama", coords: [37.445, 25.33], address: "Mykonos Town" },
-      { name: "Cantera", coords: [37.444, 25.329], address: "Mykonos Town" }
+      { name: "Lío", coords: [37.4475, 25.3284], address: "Enoplon Dinameon 6" },
+      { name: "Interni", coords: [37.4469, 25.3280], address: "Matogianni" },
+      { name: "Mediterraneo", coords: [37.4472, 25.3276], address: "Lakka Square" },
+      { name: "Zuma Mykonos", coords: [37.4543, 25.3237], address: "Cavo Tagoo Hotel" },
+      { name: "Cavo Tagoo", coords: [37.4543, 25.3237], address: "Tagoo Area" },
+      { name: "Spilia", coords: [37.4373, 25.4328], address: "Kalafati" },
+      { name: "Carosello", coords: [37.4468, 25.3280], address: "Mykonos Town" },
+      { name: "Orama", coords: [37.4500, 25.3265], address: "Old Port" },
+      { name: "Cantera", coords: [37.4462, 25.3254], address: "Little Venice" }
     ],
     nightClub: [
-      { name: "Toy Room Mykonos", coords: [37.445, 25.33], address: "Mykonos Town" },
-      { name: "Semeli", coords: [37.44395, 25.33007], address: "Mykonos Town" },
-      { name: "We❤️Myk", coords: [37.445, 25.33], address: "Mykonos Town" },
-      { name: "Void", coords: [37.4445, 25.3278], address: "Lakka Square, Mykonos Town" },
-      { name: "Bombonierre", coords: [37.445, 25.33], address: "Mykonos Town" },
-      { name: "Queen", coords: [37.445, 25.33], address: "Mykonos Town" },
-      { name: "Tabù", coords: [37.445, 25.33], address: "Mykonos Town" },
-      { name: "Cavo Paradiso", coords: [37.431, 25.377], address: "Paradise Beach" },
-      { name: "Tape", coords: [37.445, 25.33], address: "Mykonos Town" }
+      { name: "Toy Room Mykonos", coords: [37.4460, 25.3250], address: "Little Venice" },
+      { name: "Semeli The Bar", coords: [37.4461, 25.3248], address: "Little Venice" },
+      { name: "We❤️Myk", coords: [37.4475, 25.3285], address: "Mykonos Town" },
+      { name: "Void", coords: [37.4471, 25.3278], address: "Lakka" },
+      { name: "Bombonierre", coords: [37.4474, 25.3282], address: "Mykonos Town" },
+      { name: "Queen of Mykonos", coords: [37.4476, 25.3283], address: "Enoplon Dinameon" },
+      { name: "Tabu", coords: [37.4470, 25.3277], address: "Mykonos Town" },
+      { name: "Cavo Paradiso", coords: [37.4246, 25.3419], address: "Paradise Beach" },
+      { name: "Tape", coords: [37.4473, 25.3281], address: "Mykonos Town" }
     ]
   };
 
@@ -209,7 +177,6 @@ const Map = forwardRef(({ darkMode, isMobile }, ref) => {
         scrollWheelZoom={true}
         zoomControl={true}
         attributionControl={false}
-        // Forza il rendering GPU per evitare righe bianche su mobile
         preferCanvas={true}
       >
         <MapRefHandler setMap={setMapInstance} />
