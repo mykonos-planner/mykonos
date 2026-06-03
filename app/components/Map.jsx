@@ -1,8 +1,10 @@
 'use client';
-import { useEffect, useState, useImperativeHandle, forwardRef } from 'react';
+import { useEffect, useState, useImperativeHandle, forwardRef, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap, Tooltip } from 'react-leaflet';
 import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
+// Fix per iOS: assicurarsi che il CSS sia caricato e che non ci siano conflitti
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
@@ -35,6 +37,10 @@ function MapRefHandler({ setMap }) {
   const map = useMap();
   useEffect(() => {
     if (setMap) setMap(map);
+    // Forza il refresh dopo il caricamento per iOS
+    setTimeout(() => {
+      map.invalidateSize();
+    }, 200);
   }, [map, setMap]);
   return null;
 }
@@ -81,7 +87,6 @@ function Legend({ darkMode, isMobile, t }) {
   );
 }
 
-// Barra di ricerca con autocompletamento (centrata su mobile)
 function SearchBar({ locations, onSelect, darkMode, isMobile, t }) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
@@ -183,6 +188,21 @@ const Map = forwardRef(({ darkMode, isMobile, t }, ref) => {
 
   useEffect(() => {
     setIsClient(true);
+    // Aggiungi CSS per forzare rendering su iOS
+    const style = document.createElement('style');
+    style.textContent = `
+      .leaflet-container {
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+        background: #f0f0f0;
+      }
+      .leaflet-tile {
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+      }
+    `;
+    document.head.appendChild(style);
+    return () => document.head.removeChild(style);
   }, []);
 
   useImperativeHandle(ref, () => ({
@@ -297,11 +317,12 @@ const Map = forwardRef(({ darkMode, isMobile, t }, ref) => {
         worldCopyJump={false}
         maxZoom={18}
         minZoom={10}
+        renderer={L.canvas()}
       >
         <MapRefHandler setMap={setMapInstance} />
         <TileLayer
-          attribution=''
-          url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
         />
         {Object.entries(locations).map(([category, places]) => 
           places.map((place, idx) => (
