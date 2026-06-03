@@ -81,6 +81,92 @@ function Legend({ darkMode, isMobile, t }) {
   );
 }
 
+// Barra di ricerca con autocompletamento
+function SearchBar({ locations, onSelect, darkMode, isMobile, t }) {
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState([]);
+  const [showResults, setShowResults] = useState(false);
+
+  // Raccogli tutti i luoghi in un unico array
+  const allPlaces = Object.values(locations).flatMap(category => category);
+
+  const handleChange = (e) => {
+    const value = e.target.value;
+    setQuery(value);
+    if (value.length > 1) {
+      const filtered = allPlaces.filter(place =>
+        place.name.toLowerCase().includes(value.toLowerCase())
+      );
+      setResults(filtered.slice(0, 8));
+      setShowResults(true);
+    } else {
+      setResults([]);
+      setShowResults(false);
+    }
+  };
+
+  const handleSelect = (place) => {
+    setQuery(place.name);
+    setShowResults(false);
+    onSelect(place.coords);
+  };
+
+  return (
+    <div style={{
+      position: 'absolute',
+      top: 12,
+      left: '50%',
+      transform: 'translateX(-50%)',
+      zIndex: 1000,
+      width: isMobile ? '90%' : '300px',
+    }}>
+      <input
+        type="text"
+        value={query}
+        onChange={handleChange}
+        onBlur={() => setTimeout(() => setShowResults(false), 200)}
+        placeholder={t.searchPlaceholder}
+        style={{
+          width: '100%',
+          padding: '10px 16px',
+          borderRadius: '40px',
+          border: darkMode ? '1px solid #444' : '1px solid #ddd',
+          background: darkMode ? 'rgba(0,0,0,0.8)' : 'rgba(255,255,255,0.95)',
+          color: darkMode ? '#f0f0f0' : '#333',
+          fontSize: '14px',
+          outline: 'none',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+        }}
+      />
+      {showResults && results.length > 0 && (
+        <div style={{
+          background: darkMode ? 'rgba(0,0,0,0.9)' : 'white',
+          borderRadius: '20px',
+          marginTop: '8px',
+          overflow: 'hidden',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+        }}>
+          {results.map((place, idx) => (
+            <div
+              key={idx}
+              onClick={() => handleSelect(place)}
+              style={{
+                padding: '8px 16px',
+                cursor: 'pointer',
+                borderBottom: darkMode ? '1px solid #333' : '1px solid #eee',
+                color: darkMode ? '#f0f0f0' : '#333',
+                fontSize: '13px',
+              }}
+            >
+              {place.name}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 const Map = forwardRef(({ darkMode, isMobile, t }, ref) => {
   const [isClient, setIsClient] = useState(false);
   const [mapInstance, setMapInstance] = useState(null);
@@ -114,6 +200,28 @@ const Map = forwardRef(({ darkMode, isMobile, t }, ref) => {
     }
   }), [mapInstance]);
 
+  const handleSearchSelect = (coords) => {
+    if (mapInstance) {
+      mapInstance.flyTo(coords, 16, { duration: 1.2 });
+      setTimeout(() => {
+        let closestMarker = null;
+        let minDist = Infinity;
+        mapInstance.eachLayer(layer => {
+          if (layer instanceof L.Marker) {
+            const ll = layer.getLatLng();
+            const dist = Math.hypot(ll.lat - coords[0], ll.lng - coords[1]);
+            if (dist < minDist) {
+              minDist = dist;
+              closestMarker = layer;
+            }
+          }
+        });
+        if (closestMarker) closestMarker.openPopup();
+      }, 1300);
+    }
+  };
+
+  // Locali con coordinate già corrette (fornite in precedenza)
   const locations = {
     beachClub: [
       { name: "Kalua", coords: [37.408069, 25.349664], address: "Paraga Beach" },
@@ -170,6 +278,7 @@ const Map = forwardRef(({ darkMode, isMobile, t }, ref) => {
 
   return (
     <div style={{ position: 'relative', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 8px 24px rgba(0,0,0,0.15)', height: '500px', width: '100%' }}>
+      <SearchBar locations={locations} onSelect={handleSearchSelect} darkMode={darkMode} isMobile={isMobile} t={t} />
       <MapContainer
         center={mykonosCenter}
         zoom={defaultZoom}
