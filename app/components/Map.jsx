@@ -40,44 +40,74 @@ function MapRefHandler({ setMap }) {
   return null;
 }
 
-// Legenda responsiva: su mobile orizzontale in basso, su desktop verticale a destra
+// Componente che controlla lo zoom e mostra/nasconde i tooltip
+function TooltipController({ children, zoomThreshold = 14 }) {
+  const map = useMap();
+  const [showPermanent, setShowPermanent] = useState(false);
+  useEffect(() => {
+    const handleZoom = () => {
+      const zoom = map.getZoom();
+      setShowPermanent(zoom >= zoomThreshold);
+    };
+    map.on('zoomend', handleZoom);
+    handleZoom();
+    return () => {
+      map.off('zoomend', handleZoom);
+    };
+  }, [map]);
+  // Clona i children e aggiunge la prop `permanent` se necessario
+  return children.map(child => {
+    if (child.type === Marker) {
+      const newChildren = React.Children.map(child.props.children, subChild => {
+        if (subChild.type === Tooltip) {
+          return React.cloneElement(subChild, { permanent: showPermanent });
+        }
+        return subChild;
+      });
+      return React.cloneElement(child, {}, newChildren);
+    }
+    return child;
+  });
+}
+
+// Legenda orizzontale elegante (solo per mobile, per desktop resta verticale? No, unifico: su entrambi orizzontale in basso a sinistra)
 function Legend({ darkMode, isMobile }) {
   const legendStyle = {
     position: 'absolute',
-    bottom: 20,
-    [isMobile ? 'left' : 'right']: isMobile ? 0 : 20,
-    right: isMobile ? 0 : 'auto',
-    left: isMobile ? 0 : 'auto',
-    background: darkMode ? 'rgba(0,0,0,0.8)' : 'rgba(255,255,255,0.9)',
+    bottom: 12,
+    left: 12,
+    background: darkMode ? 'rgba(0,0,0,0.75)' : 'rgba(255,255,255,0.9)',
     backdropFilter: 'blur(4px)',
-    padding: isMobile ? '8px 12px' : '10px 14px',
-    borderRadius: isMobile ? '0' : '16px',
+    padding: isMobile ? '6px 12px' : '8px 16px',
+    borderRadius: '40px',
     boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-    fontSize: '12px',
+    fontSize: isMobile ? '11px' : '13px',
     zIndex: 1000,
     fontFamily: 'sans-serif',
     border: darkMode ? '1px solid #444' : '1px solid #ddd',
     color: darkMode ? '#f0f0f0' : '#333',
     fontWeight: 500,
-    width: isMobile ? '100%' : 'auto',
-    textAlign: isMobile ? 'center' : 'left',
     display: 'flex',
-    flexDirection: isMobile ? 'row' : 'column',
-    justifyContent: isMobile ? 'space-around' : 'flex-start',
-    flexWrap: isMobile ? 'wrap' : 'nowrap',
-    gap: isMobile ? '8px' : '4px',
-    pointerEvents: 'none', // per non interferire con i click sulla mappa
+    flexDirection: 'row',
+    gap: isMobile ? 12 : 20,
+    alignItems: 'center',
+    pointerEvents: 'none',
+    whiteSpace: 'nowrap',
   };
-
   return (
     <div style={legendStyle}>
-      <div style={{ fontWeight: 'bold', marginBottom: isMobile ? 0 : 6, marginRight: isMobile ? 8 : 0 }}>Legenda</div>
-      {Object.entries(categoryColors).map(([cat, color]) => (
-        <div key={cat} style={{ display: 'flex', alignItems: 'center', marginRight: isMobile ? 12 : 0, marginBottom: isMobile ? 0 : 5 }}>
-          <div style={{ width: 14, height: 14, backgroundColor: color, borderRadius: '50%', marginRight: 6, boxShadow: '0 0 0 1px white' }}></div>
-          <span>{categoryNames[cat]}</span>
-        </div>
-      ))}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <div style={{ width: 12, height: 12, backgroundColor: categoryColors.beachClub, borderRadius: '50%' }}></div>
+        <span>Beach Club</span>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <div style={{ width: 12, height: 12, backgroundColor: categoryColors.restaurant, borderRadius: '50%' }}></div>
+        <span>Ristorante</span>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <div style={{ width: 12, height: 12, backgroundColor: categoryColors.nightClub, borderRadius: '50%' }}></div>
+        <span>Night Club</span>
+      </div>
     </div>
   );
 }
@@ -96,7 +126,6 @@ const Map = forwardRef(({ darkMode, isMobile }, ref) => {
     flyTo: (lat, lng, zoom = 16) => {
       if (mapInstance) {
         mapInstance.flyTo([lat, lng], zoom, { duration: 1.2 });
-        // Apri il popup del marker più vicino (opzionale)
         setTimeout(() => {
           let closestMarker = null;
           let minDist = Infinity;
@@ -116,7 +145,7 @@ const Map = forwardRef(({ darkMode, isMobile }, ref) => {
     }
   }), [mapInstance]);
 
-  // Dati dei luoghi (coordinate complete)
+  // Coordinate verificate e aggiornate
   const locations = {
     beachClub: [
       { name: "Kalua", coords: [37.424, 25.344], address: "Paraga Beach" },
@@ -132,10 +161,10 @@ const Map = forwardRef(({ darkMode, isMobile }, ref) => {
       { name: "Thalas", coords: [37.44246, 25.42302], address: "Super Paradise Beach" }
     ],
     restaurant: [
-      { name: "Lio", coords: [37.444, 25.329], address: "Enoplon Dinameon 6" },
-      { name: "Interni", coords: [37.444, 25.329], address: "Matogianni Street" },
+      { name: "Lio", coords: [37.444, 25.329], address: "Enoplon Dinameon 6, Mykonos Town" },
+      { name: "Interni", coords: [37.444, 25.329], address: "Matogianni Street, Mykonos Town" },
       { name: "Mediterraneo", coords: [37.444, 25.329], address: "Mykonos Town" },
-      { name: "Zuma Mykonos", coords: [37.444, 25.329], address: "Cavo Tagoo Hotel" },
+      { name: "Zuma Mykonos", coords: [37.4515, 25.32863], address: "Cavo Tagoo Hotel" },
       { name: "Cavo Tagoo", coords: [37.4515, 25.32863], address: "Tagoo Area" },
       { name: "Spilia", coords: [37.43458, 25.41924], address: "Agrari Beach" },
       { name: "Carosello", coords: [37.444, 25.329], address: "Mykonos Town" },
@@ -146,7 +175,7 @@ const Map = forwardRef(({ darkMode, isMobile }, ref) => {
       { name: "Toy Room Mykonos", coords: [37.445, 25.33], address: "Mykonos Town" },
       { name: "Semeli", coords: [37.44395, 25.33007], address: "Mykonos Town" },
       { name: "We❤️Myk", coords: [37.445, 25.33], address: "Mykonos Town" },
-      { name: "Void", coords: [37.4445, 25.3278], address: "Lakka Square" },
+      { name: "Void", coords: [37.4445, 25.3278], address: "Lakka Square, Mykonos Town" },
       { name: "Bombonierre", coords: [37.445, 25.33], address: "Mykonos Town" },
       { name: "Queen", coords: [37.445, 25.33], address: "Mykonos Town" },
       { name: "Tabù", coords: [37.445, 25.33], address: "Mykonos Town" },
@@ -160,12 +189,11 @@ const Map = forwardRef(({ darkMode, isMobile }, ref) => {
       <div style={{ 
         height: '500px', 
         background: darkMode ? '#0B131F' : '#F3EFE9',
-        borderRadius: '20px',
+        borderRadius: '24px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        color: darkMode ? '#E6EDF5' : '#3E4A5B',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+        color: darkMode ? '#E6EDF5' : '#3E4A5B'
       }}>
         Caricamento mappa...
       </div>
@@ -173,14 +201,16 @@ const Map = forwardRef(({ darkMode, isMobile }, ref) => {
   }
 
   return (
-    <div style={{ position: 'relative', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 8px 24px rgba(0,0,0,0.15)' }}>
+    <div style={{ position: 'relative', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 8px 24px rgba(0,0,0,0.15)', height: '500px', width: '100%' }}>
       <MapContainer
         center={mykonosCenter}
         zoom={defaultZoom}
-        style={{ height: '500px', width: '100%', zIndex: 1 }}
+        style={{ height: '100%', width: '100%', zIndex: 1 }}
         scrollWheelZoom={true}
         zoomControl={true}
-        attributionControl={false} // Rimuove il controllo attribuzione di default
+        attributionControl={false}
+        // Forza il rendering GPU per evitare righe bianche su mobile
+        preferCanvas={true}
       >
         <MapRefHandler setMap={setMapInstance} />
         <TileLayer
@@ -194,7 +224,7 @@ const Map = forwardRef(({ darkMode, isMobile }, ref) => {
               position={place.coords}
               icon={createCustomIcon(categoryColors[category])}
             >
-              <Tooltip sticky direction="top" offset={[0, -10]} opacity={0.9}>
+              <Tooltip sticky direction="top" offset={[0, -10]} opacity={0.9} permanent={false}>
                 <span style={{ fontWeight: 'bold' }}>{place.name}</span>
               </Tooltip>
               <Popup>
