@@ -1,8 +1,9 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useImperativeHandle, forwardRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 
+// Configurazione icone
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
@@ -31,33 +32,38 @@ const createCustomIcon = (color) => {
   });
 };
 
-function MapUpdater({ center, zoom }) {
+// Componente per ottenere il riferimento alla mappa
+function MapRefHandler({ setMap }) {
   const map = useMap();
   useEffect(() => {
-    map.setView(center, zoom);
-  }, [center, map]);
+    if (setMap) setMap(map);
+  }, [map, setMap]);
   return null;
 }
 
-function Legend() {
+// Legenda migliorata
+function Legend({ darkMode }) {
   return (
     <div style={{
       position: 'absolute',
       bottom: 20,
       right: 20,
-      background: 'white',
-      padding: '8px 12px',
-      borderRadius: 12,
-      boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+      background: darkMode ? 'rgba(0,0,0,0.75)' : 'rgba(255,255,255,0.9)',
+      backdropFilter: 'blur(4px)',
+      padding: '10px 14px',
+      borderRadius: 16,
+      boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
       fontSize: '12px',
       zIndex: 1000,
       fontFamily: 'sans-serif',
-      border: '1px solid #ddd'
+      border: darkMode ? '1px solid #444' : '1px solid #ddd',
+      color: darkMode ? '#f0f0f0' : '#333',
+      fontWeight: 500
     }}>
-      <div style={{ fontWeight: 'bold', marginBottom: 4 }}>Legenda</div>
+      <div style={{ fontWeight: 'bold', marginBottom: 6, fontSize: '13px' }}>Legenda</div>
       {Object.entries(categoryColors).map(([cat, color]) => (
-        <div key={cat} style={{ display: 'flex', alignItems: 'center', marginBottom: 4 }}>
-          <div style={{ width: 16, height: 16, backgroundColor: color, borderRadius: '50%', marginRight: 8 }}></div>
+        <div key={cat} style={{ display: 'flex', alignItems: 'center', marginBottom: 5 }}>
+          <div style={{ width: 14, height: 14, backgroundColor: color, borderRadius: '50%', marginRight: 10, boxShadow: '0 0 0 1px white' }}></div>
           <span>{categoryNames[cat]}</span>
         </div>
       ))}
@@ -65,14 +71,35 @@ function Legend() {
   );
 }
 
-export default function Map({ darkMode }) {
+const Map = forwardRef(({ darkMode, onMapReady }, ref) => {
   const [isClient, setIsClient] = useState(false);
+  const [mapInstance, setMapInstance] = useState(null);
   const mykonosCenter = [37.45, 25.35];
   const defaultZoom = 12;
 
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  useImperativeHandle(ref, () => ({
+    flyTo: (lat, lng, zoom = 16) => {
+      if (mapInstance) {
+        mapInstance.flyTo([lat, lng], zoom, { duration: 1.5 });
+        // Opzionale: aprire popup dopo lo spostamento
+        setTimeout(() => {
+          mapInstance.eachLayer(layer => {
+            if (layer instanceof L.Marker && layer.getLatLng().lat === lat && layer.getLatLng().lng === lng) {
+              layer.openPopup();
+            }
+          });
+        }, 1600);
+      }
+    }
+  }), [mapInstance]);
+
+  useEffect(() => {
+    if (mapInstance && onMapReady) onMapReady(mapInstance);
+  }, [mapInstance, onMapReady]);
 
   const locations = {
     beachClub: [
@@ -138,10 +165,11 @@ export default function Map({ darkMode }) {
         scrollWheelZoom={true}
         zoomControl={true}
       >
-        <MapUpdater center={mykonosCenter} zoom={defaultZoom} />
+        <MapRefHandler setMap={setMapInstance} />
+        {/* Tile layer satellitare ESRI World Imagery */}
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+          attribution='Tiles &copy; <a href="https://www.esri.com">Esri</a> &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+          url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
         />
         {Object.entries(locations).map(([category, places]) => 
           places.map((place, idx) => (
@@ -163,7 +191,11 @@ export default function Map({ darkMode }) {
           ))
         )}
       </MapContainer>
-      <Legend />
+      <Legend darkMode={darkMode} />
     </div>
   );
-}
+});
+
+Map.displayName = 'Map';
+
+export default Map;
