@@ -2,7 +2,6 @@
 import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
 
 // Configurazione icone di default di Leaflet per evitare errori
 delete L.Icon.Default.prototype._getIconUrl;
@@ -17,7 +16,6 @@ const categoryColors = {
   beachClub: '#1E3A5F',    // Blu profondo
   restaurant: '#4A90E2',   // Azzurro mare
   nightClub: '#F4A261',    // Arancione tramonto
-  extra: '#E03B7B',        // Rosa bouganville
 };
 
 // Icone personalizzate per categoria
@@ -42,7 +40,6 @@ function MapUpdater({ center, zoom }) {
 export default function Map({ darkMode }) {
   const [isClient, setIsClient] = useState(false);
   
-  // Coordinata centrale di Mykonos (centro dell'isola)
   const mykonosCenter = [37.45, 25.35];
   const defaultZoom = 12;
 
@@ -50,7 +47,6 @@ export default function Map({ darkMode }) {
     setIsClient(true);
   }, []);
 
-  // Dati dei luoghi (coordinate ricavate da Google Maps e fonti varie)
   const locations = {
     beachClub: [
       { name: "Kalua", coords: [37.424, 25.344], address: "Paraga Beach" },
