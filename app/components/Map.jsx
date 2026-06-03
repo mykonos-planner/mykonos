@@ -81,13 +81,12 @@ function Legend({ darkMode, isMobile, t }) {
   );
 }
 
-// Barra di ricerca con autocompletamento
+// Barra di ricerca con autocompletamento (centrata su mobile)
 function SearchBar({ locations, onSelect, darkMode, isMobile, t }) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [showResults, setShowResults] = useState(false);
 
-  // Raccogli tutti i luoghi in un unico array
   const allPlaces = Object.values(locations).flatMap(category => category);
 
   const handleChange = (e) => {
@@ -115,54 +114,63 @@ function SearchBar({ locations, onSelect, darkMode, isMobile, t }) {
     <div style={{
       position: 'absolute',
       top: 12,
-      left: '50%',
-      transform: 'translateX(-50%)',
+      left: 0,
+      right: 0,
+      display: 'flex',
+      justifyContent: 'center',
       zIndex: 1000,
-      width: isMobile ? '90%' : '300px',
     }}>
-      <input
-        type="text"
-        value={query}
-        onChange={handleChange}
-        onBlur={() => setTimeout(() => setShowResults(false), 200)}
-        placeholder={t.searchPlaceholder}
-        style={{
-          width: '100%',
-          padding: '10px 16px',
-          borderRadius: '40px',
-          border: darkMode ? '1px solid #444' : '1px solid #ddd',
-          background: darkMode ? 'rgba(0,0,0,0.8)' : 'rgba(255,255,255,0.95)',
-          color: darkMode ? '#f0f0f0' : '#333',
-          fontSize: '14px',
-          outline: 'none',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-        }}
-      />
-      {showResults && results.length > 0 && (
-        <div style={{
-          background: darkMode ? 'rgba(0,0,0,0.9)' : 'white',
-          borderRadius: '20px',
-          marginTop: '8px',
-          overflow: 'hidden',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
-        }}>
-          {results.map((place, idx) => (
-            <div
-              key={idx}
-              onClick={() => handleSelect(place)}
-              style={{
-                padding: '8px 16px',
-                cursor: 'pointer',
-                borderBottom: darkMode ? '1px solid #333' : '1px solid #eee',
-                color: darkMode ? '#f0f0f0' : '#333',
-                fontSize: '13px',
-              }}
-            >
-              {place.name}
-            </div>
-          ))}
-        </div>
-      )}
+      <div style={{ width: isMobile ? '90%' : '300px', position: 'relative' }}>
+        <input
+          type="text"
+          value={query}
+          onChange={handleChange}
+          onBlur={() => setTimeout(() => setShowResults(false), 200)}
+          placeholder={t.searchPlaceholder}
+          style={{
+            width: '100%',
+            padding: '10px 16px',
+            borderRadius: '40px',
+            border: darkMode ? '1px solid #444' : '1px solid #ddd',
+            background: darkMode ? 'rgba(0,0,0,0.8)' : 'rgba(255,255,255,0.95)',
+            color: darkMode ? '#f0f0f0' : '#333',
+            fontSize: '14px',
+            outline: 'none',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+            boxSizing: 'border-box',
+          }}
+        />
+        {showResults && results.length > 0 && (
+          <div style={{
+            position: 'absolute',
+            top: '100%',
+            left: 0,
+            right: 0,
+            background: darkMode ? 'rgba(0,0,0,0.9)' : 'white',
+            borderRadius: '20px',
+            marginTop: '8px',
+            overflow: 'hidden',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+            zIndex: 1001,
+          }}>
+            {results.map((place, idx) => (
+              <div
+                key={idx}
+                onClick={() => handleSelect(place)}
+                style={{
+                  padding: '8px 16px',
+                  cursor: 'pointer',
+                  borderBottom: darkMode ? '1px solid #333' : '1px solid #eee',
+                  color: darkMode ? '#f0f0f0' : '#333',
+                  fontSize: '13px',
+                }}
+              >
+                {place.name}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -221,7 +229,6 @@ const Map = forwardRef(({ darkMode, isMobile, t }, ref) => {
     }
   };
 
-  // Locali con coordinate già corrette (fornite in precedenza)
   const locations = {
     beachClub: [
       { name: "Kalua", coords: [37.408069, 25.349664], address: "Paraga Beach" },
@@ -277,7 +284,7 @@ const Map = forwardRef(({ darkMode, isMobile, t }, ref) => {
   }
 
   return (
-    <div style={{ position: 'relative', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 8px 24px rgba(0,0,0,0.15)', height: '500px', width: '100%' }}>
+    <div style={{ position: 'relative', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 8px 24px rgba(0,0,0,0.15)', height: '500px', width: '100%', transform: 'translateZ(0)' }}>
       <SearchBar locations={locations} onSelect={handleSearchSelect} darkMode={darkMode} isMobile={isMobile} t={t} />
       <MapContainer
         center={mykonosCenter}
@@ -286,7 +293,10 @@ const Map = forwardRef(({ darkMode, isMobile, t }, ref) => {
         scrollWheelZoom={true}
         zoomControl={true}
         attributionControl={false}
-        preferCanvas={true}
+        tap={false}
+        worldCopyJump={false}
+        maxZoom={18}
+        minZoom={10}
       >
         <MapRefHandler setMap={setMapInstance} />
         <TileLayer
