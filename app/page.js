@@ -658,47 +658,48 @@ export default function HomePage() {
         )}
 
         {activeTab === 'services' && (
-          <div style={{ background: darkMode ? '#162235' : lightBgCard, borderRadius: '28px', padding: isMobile ? '20px' : '24px', boxShadow: '0 8px 20px rgba(0,0,0,0.08)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
-              <h2 style={{ color: darkMode ? '#E6EDF5' : lightText, fontSize: isMobile ? '1.4rem' : '1.8rem', margin: 0 }}>🏛️ {lang === 'it' ? 'Scopri Mykonos' : lang === 'en' ? 'Discover Mykonos' : lang === 'fr' ? 'Découvrez Mykonos' : 'Descubre Mykonos'}</h2>
-              <div style={{ display: 'flex', gap: '12px' }}>
-                <button onClick={() => setServicesView('list')} style={{ background: servicesView === 'list' ? (darkMode ? accentBlue : lightPrimary) : 'transparent', color: servicesView === 'list' ? 'white' : (darkMode ? '#E6EDF5' : lightText), border: `1px solid ${darkMode ? accentBlue : lightPrimary}`, borderRadius: '40px', padding: '8px 20px', cursor: 'pointer', fontWeight: 'bold' }}>📋 Lista</button>
-                <button onClick={() => setServicesView('map')} style={{ background: servicesView === 'map' ? (darkMode ? accentBlue : lightPrimary) : 'transparent', color: servicesView === 'map' ? 'white' : (darkMode ? '#E6EDF5' : lightText), border: `1px solid ${darkMode ? accentBlue : lightPrimary}`, borderRadius: '40px', padding: '8px 20px', cursor: 'pointer', fontWeight: 'bold' }}>🗺️ Mappa</button>
-              </div>
-            </div>
-            {servicesView === 'list' ? (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px,1fr))', gap: '24px', marginTop: '24px' }}>
-                <div style={{ background: darkMode ? '#0B131F' : lightBgAlt, borderRadius: '20px', padding: '16px' }}>
-                  <h3 style={{ color: darkMode ? accentBlue : lightPrimary, marginBottom: '12px', fontSize: isMobile ? '1.1rem' : '1.2rem' }}>🏖️ {t.beachClubs}</h3>
-                  <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                    {servicesData.beachClubs.map(c => <li key={c} style={{ marginBottom: '8px', color: darkMode ? '#E6EDF5' : lightText, fontSize: isMobile ? '0.85rem' : '0.9rem' }}>🌊 {c}</li>)}
-                  </ul>
-                </div>
-                <div style={{ background: darkMode ? '#0B131F' : lightBgAlt, borderRadius: '20px', padding: '16px' }}>
-                  <h3 style={{ color: darkMode ? accentBlue : lightPrimary, marginBottom: '12px', fontSize: isMobile ? '1.1rem' : '1.2rem' }}>🎧 {t.nightClubs}</h3>
-                  <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                    {servicesData.nightClubs.map(c => <li key={c} style={{ marginBottom: '8px', color: darkMode ? '#E6EDF5' : lightText, fontSize: isMobile ? '0.85rem' : '0.9rem' }}>🎵 {c}</li>)}
-                  </ul>
-                </div>
-                <div style={{ background: darkMode ? '#0B131F' : lightBgAlt, borderRadius: '20px', padding: '16px' }}>
-                  <h3 style={{ color: darkMode ? accentBlue : lightPrimary, marginBottom: '12px', fontSize: isMobile ? '1.1rem' : '1.2rem' }}>🍽️ {t.restaurants}</h3>
-                  <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                    {servicesData.restaurants.map(c => <li key={c} style={{ marginBottom: '8px', color: darkMode ? '#E6EDF5' : lightText, fontSize: isMobile ? '0.85rem' : '0.9rem' }}>🍴 {c}</li>)}
-                  </ul>
-                </div>
-                <div style={{ background: darkMode ? '#0B131F' : lightBgAlt, borderRadius: '20px', padding: '16px' }}>
-                  <h3 style={{ color: darkMode ? accentBlue : lightPrimary, marginBottom: '12px', fontSize: isMobile ? '1.1rem' : '1.2rem' }}>⚡ {t.extras}</h3>
-                  <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                    {servicesData.extras.map(c => <li key={c} style={{ marginBottom: '8px', color: darkMode ? '#E6EDF5' : lightText, fontSize: isMobile ? '0.85rem' : '0.9rem' }}>🚤 {c}</li>)}
-                  </ul>
-                </div>
-              </div>
-            ) : (
-              <Map darkMode={darkMode} />
-            )}
-            <p style={{ marginTop: '24px', color: darkMode ? '#E6EDF5' : lightTextMuted, fontSize: isMobile ? '0.8rem' : '0.9rem', textAlign: 'center' }}>💡 Per prenotazioni e disponibilità, contattami su WhatsApp!</p>
-          </div>
-        )}
+  <div style={{ background: darkMode ? '#162235' : lightBgCard, borderRadius: '28px', padding: isMobile ? '20px' : '24px', boxShadow: '0 8px 20px rgba(0,0,0,0.08)' }}>
+    <h2 style={{ color: darkMode ? '#E6EDF5' : lightText, fontSize: isMobile ? '1.4rem' : '1.8rem', marginBottom: '24px' }}>🏛️ {lang === 'it' ? 'Scopri Mykonos' : lang === 'en' ? 'Discover Mykonos' : lang === 'fr' ? 'Découvrez Mykonos' : 'Descubre Mykonos'}</h2>
+    
+    {/* MAPPA (prima) */}
+    <div style={{ marginBottom: '40px' }}>
+      <h3 style={{ color: darkMode ? accentBlue : lightPrimary, marginBottom: '12px', fontSize: isMobile ? '1.2rem' : '1.3rem' }}>🗺️ Mappa interattiva</h3>
+      <Map darkMode={darkMode} />
+    </div>
+    
+    {/* LISTA (dopo) */}
+    <div>
+      <h3 style={{ color: darkMode ? accentBlue : lightPrimary, marginBottom: '12px', fontSize: isMobile ? '1.2rem' : '1.3rem' }}>📋 Lista dei locali</h3>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px,1fr))', gap: '24px', marginTop: '24px' }}>
+        <div style={{ background: darkMode ? '#0B131F' : lightBgAlt, borderRadius: '20px', padding: '16px' }}>
+          <h3 style={{ color: darkMode ? accentBlue : lightPrimary, marginBottom: '12px', fontSize: isMobile ? '1.1rem' : '1.2rem' }}>🏖️ {t.beachClubs}</h3>
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+            {servicesData.beachClubs.map(c => <li key={c} style={{ marginBottom: '8px', color: darkMode ? '#E6EDF5' : lightText, fontSize: isMobile ? '0.85rem' : '0.9rem' }}>🌊 {c}</li>)}
+          </ul>
+        </div>
+        <div style={{ background: darkMode ? '#0B131F' : lightBgAlt, borderRadius: '20px', padding: '16px' }}>
+          <h3 style={{ color: darkMode ? accentBlue : lightPrimary, marginBottom: '12px', fontSize: isMobile ? '1.1rem' : '1.2rem' }}>🎧 {t.nightClubs}</h3>
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+            {servicesData.nightClubs.map(c => <li key={c} style={{ marginBottom: '8px', color: darkMode ? '#E6EDF5' : lightText, fontSize: isMobile ? '0.85rem' : '0.9rem' }}>🎵 {c}</li>)}
+          </ul>
+        </div>
+        <div style={{ background: darkMode ? '#0B131F' : lightBgAlt, borderRadius: '20px', padding: '16px' }}>
+          <h3 style={{ color: darkMode ? accentBlue : lightPrimary, marginBottom: '12px', fontSize: isMobile ? '1.1rem' : '1.2rem' }}>🍽️ {t.restaurants}</h3>
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+            {servicesData.restaurants.map(c => <li key={c} style={{ marginBottom: '8px', color: darkMode ? '#E6EDF5' : lightText, fontSize: isMobile ? '0.85rem' : '0.9rem' }}>🍴 {c}</li>)}
+          </ul>
+        </div>
+        <div style={{ background: darkMode ? '#0B131F' : lightBgAlt, borderRadius: '20px', padding: '16px' }}>
+          <h3 style={{ color: darkMode ? accentBlue : lightPrimary, marginBottom: '12px', fontSize: isMobile ? '1.1rem' : '1.2rem' }}>⚡ {t.extras}</h3>
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+            {servicesData.extras.map(c => <li key={c} style={{ marginBottom: '8px', color: darkMode ? '#E6EDF5' : lightText, fontSize: isMobile ? '0.85rem' : '0.9rem' }}>🚤 {c}</li>)}
+          </ul>
+        </div>
+      </div>
+    </div>
+    <p style={{ marginTop: '24px', color: darkMode ? '#E6EDF5' : lightTextMuted, fontSize: isMobile ? '0.8rem' : '0.9rem', textAlign: 'center' }}>💡 Per prenotazioni e disponibilità, contattami su WhatsApp!</p>
+  </div>
+)}
       </div>
     </div>
   );
