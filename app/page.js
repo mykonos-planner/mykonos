@@ -1,10 +1,10 @@
 'use client';
 export const dynamic = 'force-dynamic';
 import { useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
+import nextDynamic from 'next/dynamic';
 
 // Import dinamico di Map per evitare errore window is not defined
-const Map = dynamic(() => import('./components/Map'), {
+const Map = nextDynamic(() => import('./components/Map'), {
   ssr: false,
   loading: () => (
     <div style={{ 
