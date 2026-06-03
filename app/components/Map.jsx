@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState, useImperativeHandle, forwardRef } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap, Tooltip } from 'react-leaflet';
 import L from 'leaflet';
 
 // Configurazione icone
@@ -32,7 +32,6 @@ const createCustomIcon = (color) => {
   });
 };
 
-// Componente per ottenere il riferimento alla mappa
 function MapRefHandler({ setMap }) {
   const map = useMap();
   useEffect(() => {
@@ -41,29 +40,41 @@ function MapRefHandler({ setMap }) {
   return null;
 }
 
-// Legenda migliorata
-function Legend({ darkMode }) {
+// Legenda responsiva: su mobile orizzontale in basso, su desktop verticale a destra
+function Legend({ darkMode, isMobile }) {
+  const legendStyle = {
+    position: 'absolute',
+    bottom: 20,
+    [isMobile ? 'left' : 'right']: isMobile ? 0 : 20,
+    right: isMobile ? 0 : 'auto',
+    left: isMobile ? 0 : 'auto',
+    background: darkMode ? 'rgba(0,0,0,0.8)' : 'rgba(255,255,255,0.9)',
+    backdropFilter: 'blur(4px)',
+    padding: isMobile ? '8px 12px' : '10px 14px',
+    borderRadius: isMobile ? '0' : '16px',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+    fontSize: '12px',
+    zIndex: 1000,
+    fontFamily: 'sans-serif',
+    border: darkMode ? '1px solid #444' : '1px solid #ddd',
+    color: darkMode ? '#f0f0f0' : '#333',
+    fontWeight: 500,
+    width: isMobile ? '100%' : 'auto',
+    textAlign: isMobile ? 'center' : 'left',
+    display: 'flex',
+    flexDirection: isMobile ? 'row' : 'column',
+    justifyContent: isMobile ? 'space-around' : 'flex-start',
+    flexWrap: isMobile ? 'wrap' : 'nowrap',
+    gap: isMobile ? '8px' : '4px',
+    pointerEvents: 'none', // per non interferire con i click sulla mappa
+  };
+
   return (
-    <div style={{
-      position: 'absolute',
-      bottom: 20,
-      right: 20,
-      background: darkMode ? 'rgba(0,0,0,0.75)' : 'rgba(255,255,255,0.9)',
-      backdropFilter: 'blur(4px)',
-      padding: '10px 14px',
-      borderRadius: 16,
-      boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
-      fontSize: '12px',
-      zIndex: 1000,
-      fontFamily: 'sans-serif',
-      border: darkMode ? '1px solid #444' : '1px solid #ddd',
-      color: darkMode ? '#f0f0f0' : '#333',
-      fontWeight: 500
-    }}>
-      <div style={{ fontWeight: 'bold', marginBottom: 6, fontSize: '13px' }}>Legenda</div>
+    <div style={legendStyle}>
+      <div style={{ fontWeight: 'bold', marginBottom: isMobile ? 0 : 6, marginRight: isMobile ? 8 : 0 }}>Legenda</div>
       {Object.entries(categoryColors).map(([cat, color]) => (
-        <div key={cat} style={{ display: 'flex', alignItems: 'center', marginBottom: 5 }}>
-          <div style={{ width: 14, height: 14, backgroundColor: color, borderRadius: '50%', marginRight: 10, boxShadow: '0 0 0 1px white' }}></div>
+        <div key={cat} style={{ display: 'flex', alignItems: 'center', marginRight: isMobile ? 12 : 0, marginBottom: isMobile ? 0 : 5 }}>
+          <div style={{ width: 14, height: 14, backgroundColor: color, borderRadius: '50%', marginRight: 6, boxShadow: '0 0 0 1px white' }}></div>
           <span>{categoryNames[cat]}</span>
         </div>
       ))}
@@ -71,7 +82,7 @@ function Legend({ darkMode }) {
   );
 }
 
-const Map = forwardRef(({ darkMode, onMapReady }, ref) => {
+const Map = forwardRef(({ darkMode, isMobile }, ref) => {
   const [isClient, setIsClient] = useState(false);
   const [mapInstance, setMapInstance] = useState(null);
   const mykonosCenter = [37.45, 25.35];
@@ -84,23 +95,28 @@ const Map = forwardRef(({ darkMode, onMapReady }, ref) => {
   useImperativeHandle(ref, () => ({
     flyTo: (lat, lng, zoom = 16) => {
       if (mapInstance) {
-        mapInstance.flyTo([lat, lng], zoom, { duration: 1.5 });
-        // Opzionale: aprire popup dopo lo spostamento
+        mapInstance.flyTo([lat, lng], zoom, { duration: 1.2 });
+        // Apri il popup del marker più vicino (opzionale)
         setTimeout(() => {
+          let closestMarker = null;
+          let minDist = Infinity;
           mapInstance.eachLayer(layer => {
-            if (layer instanceof L.Marker && layer.getLatLng().lat === lat && layer.getLatLng().lng === lng) {
-              layer.openPopup();
+            if (layer instanceof L.Marker) {
+              const ll = layer.getLatLng();
+              const dist = Math.hypot(ll.lat - lat, ll.lng - lng);
+              if (dist < minDist) {
+                minDist = dist;
+                closestMarker = layer;
+              }
             }
           });
-        }, 1600);
+          if (closestMarker) closestMarker.openPopup();
+        }, 1300);
       }
     }
   }), [mapInstance]);
 
-  useEffect(() => {
-    if (mapInstance && onMapReady) onMapReady(mapInstance);
-  }, [mapInstance, onMapReady]);
-
+  // Dati dei luoghi (coordinate complete)
   const locations = {
     beachClub: [
       { name: "Kalua", coords: [37.424, 25.344], address: "Paraga Beach" },
@@ -119,7 +135,7 @@ const Map = forwardRef(({ darkMode, onMapReady }, ref) => {
       { name: "Lio", coords: [37.444, 25.329], address: "Enoplon Dinameon 6" },
       { name: "Interni", coords: [37.444, 25.329], address: "Matogianni Street" },
       { name: "Mediterraneo", coords: [37.444, 25.329], address: "Mykonos Town" },
-      { name: "Zuma", coords: [37.444, 25.329], address: "Cavo Tagoo Hotel" },
+      { name: "Zuma Mykonos", coords: [37.444, 25.329], address: "Cavo Tagoo Hotel" },
       { name: "Cavo Tagoo", coords: [37.4515, 25.32863], address: "Tagoo Area" },
       { name: "Spilia", coords: [37.43458, 25.41924], address: "Agrari Beach" },
       { name: "Carosello", coords: [37.444, 25.329], address: "Mykonos Town" },
@@ -127,15 +143,15 @@ const Map = forwardRef(({ darkMode, onMapReady }, ref) => {
       { name: "Cantera", coords: [37.444, 25.329], address: "Mykonos Town" }
     ],
     nightClub: [
-      { name: "Toy Room", coords: [37.445, 25.33], address: "Mykonos Town" },
+      { name: "Toy Room Mykonos", coords: [37.445, 25.33], address: "Mykonos Town" },
       { name: "Semeli", coords: [37.44395, 25.33007], address: "Mykonos Town" },
+      { name: "We❤️Myk", coords: [37.445, 25.33], address: "Mykonos Town" },
       { name: "Void", coords: [37.4445, 25.3278], address: "Lakka Square" },
       { name: "Bombonierre", coords: [37.445, 25.33], address: "Mykonos Town" },
       { name: "Queen", coords: [37.445, 25.33], address: "Mykonos Town" },
       { name: "Tabù", coords: [37.445, 25.33], address: "Mykonos Town" },
-      { name: "Tape", coords: [37.445, 25.33], address: "Mykonos Town" },
       { name: "Cavo Paradiso", coords: [37.431, 25.377], address: "Paradise Beach" },
-      { name: "We❤️Myk", coords: [37.445, 25.33], address: "Mykonos Town" }
+      { name: "Tape", coords: [37.445, 25.33], address: "Mykonos Town" }
     ]
   };
 
@@ -164,11 +180,11 @@ const Map = forwardRef(({ darkMode, onMapReady }, ref) => {
         style={{ height: '500px', width: '100%', zIndex: 1 }}
         scrollWheelZoom={true}
         zoomControl={true}
+        attributionControl={false} // Rimuove il controllo attribuzione di default
       >
         <MapRefHandler setMap={setMapInstance} />
-        {/* Tile layer satellitare ESRI World Imagery */}
         <TileLayer
-          attribution='Tiles &copy; <a href="https://www.esri.com">Esri</a> &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+          attribution=''
           url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
         />
         {Object.entries(locations).map(([category, places]) => 
@@ -178,6 +194,9 @@ const Map = forwardRef(({ darkMode, onMapReady }, ref) => {
               position={place.coords}
               icon={createCustomIcon(categoryColors[category])}
             >
+              <Tooltip sticky direction="top" offset={[0, -10]} opacity={0.9}>
+                <span style={{ fontWeight: 'bold' }}>{place.name}</span>
+              </Tooltip>
               <Popup>
                 <div style={{ fontFamily: 'sans-serif', minWidth: '150px' }}>
                   <strong style={{ fontSize: '1rem' }}>{place.name}</strong>
@@ -191,7 +210,7 @@ const Map = forwardRef(({ darkMode, onMapReady }, ref) => {
           ))
         )}
       </MapContainer>
-      <Legend darkMode={darkMode} />
+      <Legend darkMode={darkMode} isMobile={isMobile} />
     </div>
   );
 });
