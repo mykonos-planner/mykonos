@@ -422,60 +422,11 @@ export default function HomePage() {
     extras: ['Jetski', 'Rental Boat', 'Rental Yatch', 'Boat party', 'Rental Car', 'Rental Scooter', 'Rental ATV']
   };
 
-  // Funzione per centrare la mappa quando si clicca su un elemento della lista
   const handlePlaceClick = (coords) => {
     if (mapRef.current && mapRef.current.flyTo) {
       mapRef.current.flyTo(coords[0], coords[1], 16);
     }
   };
-
-  // Raccogli tutte le posizioni con le loro coordinate per associarle ai nomi
-  const allLocations = [
-    ...servicesData.beachClubs.map(name => {
-      let coords = null;
-      const found = (() => {
-        if (name === 'Kalua') return [37.424, 25.344];
-        if (name === 'SantAnna') return [37.4245, 25.3445];
-        if (name === 'Tropicana') return [37.424, 25.356];
-        if (name === 'Scorpios') return [37.4235, 25.344];
-        if (name === 'Alemagou') return [37.4651, 25.3515];
-        if (name === 'Nammos') return [37.41558, 25.33694];
-        if (name === 'Principote') return [37.47679, 25.35983];
-        if (name === 'Super Paradise') return [37.41622, 25.36857];
-        if (name === 'Anios') return [37.419, 25.351];
-        if (name === 'Branco') return [37.41395, 25.34503];
-        if (name === 'Thalas') return [37.44246, 25.42302];
-        return null;
-      })();
-      return { name, coords: found };
-    }),
-    ...servicesData.restaurants.map(name => {
-      let coords = null;
-      if (name === 'Lìo') return [37.444, 25.329];
-      if (name === 'Interni') return [37.444, 25.329];
-      if (name === 'Mediterraneo') return [37.444, 25.329];
-      if (name === 'Zuma Mykonos') return [37.444, 25.329];
-      if (name === 'Cavo Tagoo') return [37.4515, 25.32863];
-      if (name === 'Spilia') return [37.43458, 25.41924];
-      if (name === 'Carosello') return [37.444, 25.329];
-      if (name === 'Orama') return [37.445, 25.33];
-      if (name === 'Cantera') return [37.444, 25.329];
-      return null;
-    }).map((coords, idx) => ({ name: servicesData.restaurants[idx], coords })),
-    ...servicesData.nightClubs.map(name => {
-      let coords = null;
-      if (name === 'Toy Room Mykonos') return [37.445, 25.33];
-      if (name === 'Semeli') return [37.44395, 25.33007];
-      if (name === 'We❤️Myk') return [37.445, 25.33];
-      if (name === 'Void') return [37.4445, 25.3278];
-      if (name === 'Bombonierre') return [37.445, 25.33];
-      if (name === 'Queen') return [37.445, 25.33];
-      if (name === 'Tabù') return [37.445, 25.33];
-      if (name === 'Cavo Paradiso') return [37.431, 25.377];
-      if (name === 'Tape') return [37.445, 25.33];
-      return null;
-    }).map((coords, idx) => ({ name: servicesData.nightClubs[idx], coords }))
-  ];
 
   const transitionStyle = {
     transition: 'opacity 0.2s ease-in-out, transform 0.2s ease-in-out',
@@ -716,13 +667,11 @@ export default function HomePage() {
           <div style={{ background: darkMode ? '#162235' : lightBgCard, borderRadius: '28px', padding: isMobile ? '20px' : '24px', boxShadow: '0 8px 20px rgba(0,0,0,0.08)' }}>
             <h2 style={{ color: darkMode ? '#E6EDF5' : lightText, fontSize: isMobile ? '1.4rem' : '1.8rem', marginBottom: '24px' }}>🏛️ {lang === 'it' ? 'Scopri Mykonos' : lang === 'en' ? 'Discover Mykonos' : lang === 'fr' ? 'Découvrez Mykonos' : 'Descubre Mykonos'}</h2>
             
-            {/* MAPPA (prima) */}
             <div style={{ marginBottom: '40px' }}>
               <h3 style={{ color: darkMode ? accentBlue : lightPrimary, marginBottom: '12px', fontSize: isMobile ? '1.2rem' : '1.3rem' }}>🗺️ Mappa interattiva</h3>
-              <Map ref={mapRef} darkMode={darkMode} />
+              <Map ref={mapRef} darkMode={darkMode} isMobile={isMobile} />
             </div>
             
-            {/* LISTA (dopo) */}
             <div>
               <h3 style={{ color: darkMode ? accentBlue : lightPrimary, marginBottom: '12px', fontSize: isMobile ? '1.2rem' : '1.3rem' }}>📋 Lista dei locali</h3>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px,1fr))', gap: '24px', marginTop: '24px' }}>
@@ -730,10 +679,22 @@ export default function HomePage() {
                   <h3 style={{ color: darkMode ? accentBlue : lightPrimary, marginBottom: '12px', fontSize: isMobile ? '1.1rem' : '1.2rem' }}>🏖️ {t.beachClubs}</h3>
                   <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                     {servicesData.beachClubs.map(c => {
-                      const place = allLocations.find(l => l.name === c);
-                      const coords = place?.coords;
+                      const coords = (() => {
+                        if (c === 'Kalua') return [37.424, 25.344];
+                        if (c === 'SantAnna') return [37.4245, 25.3445];
+                        if (c === 'Tropicana') return [37.424, 25.356];
+                        if (c === 'Scorpios') return [37.4235, 25.344];
+                        if (c === 'Alemagou') return [37.4651, 25.3515];
+                        if (c === 'Nammos') return [37.41558, 25.33694];
+                        if (c === 'Principote') return [37.47679, 25.35983];
+                        if (c === 'Super Paradise') return [37.41622, 25.36857];
+                        if (c === 'Anios') return [37.419, 25.351];
+                        if (c === 'Branco') return [37.41395, 25.34503];
+                        if (c === 'Thalas') return [37.44246, 25.42302];
+                        return null;
+                      })();
                       return (
-                        <li key={c} style={{ marginBottom: '8px', color: darkMode ? '#E6EDF5' : lightText, fontSize: isMobile ? '0.85rem' : '0.9rem', cursor: coords ? 'pointer' : 'default', textDecoration: coords ? 'underline' : 'none' }} onClick={() => coords && handlePlaceClick(coords)}>
+                        <li key={c} style={{ marginBottom: '8px', color: darkMode ? '#E6EDF5' : lightText, fontSize: isMobile ? '0.85rem' : '0.9rem', cursor: coords ? 'pointer' : 'default' }} onClick={() => coords && handlePlaceClick(coords)}>
                           🌊 {c}
                         </li>
                       );
@@ -744,10 +705,20 @@ export default function HomePage() {
                   <h3 style={{ color: darkMode ? accentBlue : lightPrimary, marginBottom: '12px', fontSize: isMobile ? '1.1rem' : '1.2rem' }}>🎧 {t.nightClubs}</h3>
                   <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                     {servicesData.nightClubs.map(c => {
-                      const place = allLocations.find(l => l.name === c);
-                      const coords = place?.coords;
+                      const coords = (() => {
+                        if (c === 'Toy Room Mykonos') return [37.445, 25.33];
+                        if (c === 'Semeli') return [37.44395, 25.33007];
+                        if (c === 'We❤️Myk') return [37.445, 25.33];
+                        if (c === 'Void') return [37.4445, 25.3278];
+                        if (c === 'Bombonierre') return [37.445, 25.33];
+                        if (c === 'Queen') return [37.445, 25.33];
+                        if (c === 'Tabù') return [37.445, 25.33];
+                        if (c === 'Cavo Paradiso') return [37.431, 25.377];
+                        if (c === 'Tape') return [37.445, 25.33];
+                        return null;
+                      })();
                       return (
-                        <li key={c} style={{ marginBottom: '8px', color: darkMode ? '#E6EDF5' : lightText, fontSize: isMobile ? '0.85rem' : '0.9rem', cursor: coords ? 'pointer' : 'default', textDecoration: coords ? 'underline' : 'none' }} onClick={() => coords && handlePlaceClick(coords)}>
+                        <li key={c} style={{ marginBottom: '8px', color: darkMode ? '#E6EDF5' : lightText, fontSize: isMobile ? '0.85rem' : '0.9rem', cursor: coords ? 'pointer' : 'default' }} onClick={() => coords && handlePlaceClick(coords)}>
                           🎵 {c}
                         </li>
                       );
@@ -758,10 +729,20 @@ export default function HomePage() {
                   <h3 style={{ color: darkMode ? accentBlue : lightPrimary, marginBottom: '12px', fontSize: isMobile ? '1.1rem' : '1.2rem' }}>🍽️ {t.restaurants}</h3>
                   <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                     {servicesData.restaurants.map(c => {
-                      const place = allLocations.find(l => l.name === c);
-                      const coords = place?.coords;
+                      const coords = (() => {
+                        if (c === 'Lìo') return [37.444, 25.329];
+                        if (c === 'Interni') return [37.444, 25.329];
+                        if (c === 'Mediterraneo') return [37.444, 25.329];
+                        if (c === 'Zuma Mykonos') return [37.444, 25.329];
+                        if (c === 'Cavo Tagoo') return [37.4515, 25.32863];
+                        if (c === 'Spilia') return [37.43458, 25.41924];
+                        if (c === 'Carosello') return [37.444, 25.329];
+                        if (c === 'Orama') return [37.445, 25.33];
+                        if (c === 'Cantera') return [37.444, 25.329];
+                        return null;
+                      })();
                       return (
-                        <li key={c} style={{ marginBottom: '8px', color: darkMode ? '#E6EDF5' : lightText, fontSize: isMobile ? '0.85rem' : '0.9rem', cursor: coords ? 'pointer' : 'default', textDecoration: coords ? 'underline' : 'none' }} onClick={() => coords && handlePlaceClick(coords)}>
+                        <li key={c} style={{ marginBottom: '8px', color: darkMode ? '#E6EDF5' : lightText, fontSize: isMobile ? '0.85rem' : '0.9rem', cursor: coords ? 'pointer' : 'default' }} onClick={() => coords && handlePlaceClick(coords)}>
                           🍴 {c}
                         </li>
                       );
