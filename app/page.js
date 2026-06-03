@@ -1,13 +1,31 @@
 'use client';
 export const dynamic = 'force-dynamic';
 import { useState, useEffect } from 'react';
-import Map from './components/Map';
+import dynamic from 'next/dynamic';
+
+// Import dinamico di Map per evitare errore window is not defined
+const Map = dynamic(() => import('./components/Map'), {
+  ssr: false,
+  loading: () => (
+    <div style={{ 
+      height: '500px', 
+      background: '#F3EFE9',
+      borderRadius: '20px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      color: '#3E4A5B'
+    }}>
+      Caricamento mappa...
+    </div>
+  )
+});
 
 export default function HomePage() {
   const [events, setEvents] = useState([]);
   const [lang, setLang] = useState('it');
   const [activeTab, setActiveTab] = useState('explore');
-  const [servicesView, setServicesView] = useState('list'); // 'list' o 'map'
+  const [servicesView, setServicesView] = useState('list');
   const [formData, setFormData] = useState({
     name: '', groupSize: '2', arrivalDate: '', stayDays: '7', customDays: '', budget: 'mid'
   });
@@ -304,7 +322,6 @@ export default function HomePage() {
       return true;
     });
 
-    // Escludi i dinner show (es. Carosello) dal pranzo
     const lunchCandidates = allRestaurants.filter(r => !r.name.toLowerCase().includes('dinner show'));
     const dinnerCandidates = allRestaurants;
 
