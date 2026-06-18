@@ -231,16 +231,17 @@ const Map = forwardRef(({ darkMode, isMobile, t }, ref) => {
         { name: "Thalas", coords: [25.368308, 37.415119], address: "Super Paradise" }
       ],
       restaurant: [
-        { name: "Lío", coords: [25.328236, 37.444994], address: "Enoplon Dinameon 6" },
-        { name: "Interni", coords: [25.328708, 37.445589], address: "Matogianni" },
-        { name: "Mediterraneo", coords: [25.328706, 37.445592], address: "Lakka Square" },
-        { name: "Zuma Mykonos", coords: [25.329533, 37.458539], address: "Cavo Tagoo Hotel" },
-        { name: "Cavo Tagoo", coords: [25.328942, 37.456669], address: "Tagoo Area" },
-        { name: "Spilia", coords: [25.419383, 37.434731], address: "Kalafati" },
-        { name: "Carosello", coords: [25.328, 37.445], address: "Mykonos Town" },
-        { name: "Orama", coords: [25.326158, 37.425753], address: "Old Port" },
-        { name: "Cantera", coords: [25.326300, 37.445947], address: "Little Venice" }
-      ],
+  { name: "Lío", coords: [37.444994, 25.328236], address: "Enoplon Dinameon 6" },
+  { name: "Interni", coords: [37.445589, 25.328708], address: "Matogianni" },
+  { name: "Mediterraneo", coords: [37.445592, 25.328706], address: "Lakka Square" },
+  { name: "Zuma Mykonos", coords: [37.458539, 25.329533], address: "Cavo Tagoo Hotel" },
+  { name: "Cavo Tagoo", coords: [37.456669, 25.328942], address: "Tagoo Area" },
+  { name: "Spilia", coords: [37.434731, 25.419383], address: "Kalafati" },
+  { name: "Carosello Lunch @ Baladaya", coords: [37.41044, 25.35785], address: "Baladaya Beach" },
+  { name: "Carosello Dinner @ Pinky Beach", coords: [37.40977, 25.34863], address: "Pinky Beach" },
+  { name: "Orama", coords: [37.425753, 25.326158], address: "Old Port" },
+  { name: "Cantera", coords: [37.445947, 25.326300], address: "Little Venice" }
+],
       nightClub: [
         { name: "Toy Room Mykonos", coords: [25.326497, 37.445694], address: "Little Venice" },
         { name: "Semeli The Bar", coords: [25.326511, 37.445697], address: "Little Venice" },
