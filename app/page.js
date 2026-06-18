@@ -756,7 +756,8 @@ export default function HomePage() {
                         if (c === 'Zuma Mykonos') return [37.458539, 25.329533];
                         if (c === 'Cavo Tagoo') return [37.456669, 25.328942];
                         if (c === 'Spilia') return [37.434731, 25.419383];
-                        if (c === 'Carosello') return [37.445, 25.328];
+                        if (c === 'Carosello Lunch @ Baladaya') return [37.41044, 25.35785];
+                        if (c === 'Carosello Dinner @ Pinky Beach') return [37.40977, 25.34863];
                         if (c === 'Orama') return [37.425753, 25.326158];
                         if (c === 'Cantera') return [37.445947, 25.326300];
                         return null;
