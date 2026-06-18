@@ -438,7 +438,7 @@ export default function HomePage() {
   const servicesData = {
     beachClubs: ['Kalua', 'SantAnna', 'Tropicana', 'Scorpios', 'Alemagou', 'Nammos', 'Principote', 'Super Paradise', 'Anios', 'Branco', 'Thalas'],
     nightClubs: ['Toy Room Mykonos', 'Semeli The Bar', 'We❤️Myk', 'Void', 'Bombonierre', 'Queen of Mykonos', 'Tabu', 'Cavo Paradiso', 'Tape'],
-    restaurants: ['Lío', 'Interni', 'Mediterraneo', 'Zuma Mykonos', 'Cavo Tagoo', 'Spilia', 'Carosello', 'Orama', 'Cantera'],
+    restaurants: ['Lío', 'Interni', 'Mediterraneo', 'Zuma Mykonos', 'Cavo Tagoo', 'Spilia', 'Carosello Lunch @ Baladaya', 'Carosello Dinner @ Pinky Beach', 'Orama', 'Cantera'],
     extras: ['Jetski', 'Rental Boat', 'Rental Yatch', 'Boat party', 'Rental Car', 'Rental Scooter', 'Rental ATV']
   };
 
